@@ -1,136 +1,92 @@
-import React, { useEffect, useState, useRef } from 'react';
-import Navbar from './components/Navbar';
-import Sidebar from './components/Sidebar';
-import { Routes, Route } from 'react-router-dom';
-import Add from './pages/Add';
-import Notes from './pages/Notes';
-import Users from './pages/Users';
-import Login from './components/Login';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
-import $ from 'jquery';
-import 'jquery.ripples';
+import React, { useEffect, useState } from "react";
+import Navbar from "./components/Navbar";
+import Sidebar from "./components/Sidebar";
+import { Routes, Route } from "react-router-dom";
+import Add from "./pages/Add";
+import Notes from "./pages/Notes";
+import Users from "./pages/Users";
+import Pyq from "./pages/Pyq";
+import Login from "./components/Login";
+import Dashboard from "./pages/Dashboard";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const App = () => {
-  const [token, setToken] = useState(localStorage.getItem('token') ? localStorage.getItem('token') : '');
-  const rippleRef = useRef(null);
+  const [token, setToken] = useState(
+    localStorage.getItem("token") ? localStorage.getItem("token") : ""
+  );
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('token', token);
+    localStorage.setItem("token", token);
   }, [token]);
 
-  // Initialize water ripple effect
   useEffect(() => {
-    const $el = $(rippleRef.current);
-
-    const supportsWebGL = (() => {
-      try {
-        const c = document.createElement('canvas');
-        return !!(
-          window.WebGLRenderingContext &&
-          (c.getContext('webgl') || c.getContext('experimental-webgl'))
-        );
-      } catch (e) {
-        return false;
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setSidebarOpen(false);
       }
-    })();
-
-    const cfg = {
-      resolution: 256,
-      dropRadius: 18,
-      perturbance: 0.02,
-      interactive: true,
-      throttleMs: 80
     };
 
-    function initRipples() {
-      $el.ripples({
-        resolution: cfg.resolution,
-        dropRadius: cfg.dropRadius,
-        perturbance: cfg.perturbance,
-        interactive: cfg.interactive,
-        crossOrigin: ''
-      });
-    }
-
-    function destroyRipples() {
-      try {
-        $el.ripples('destroy');
-      } catch {}
-    }
-
-    if (supportsWebGL) {
-      initRipples();
-    }
-
-    let lastTime = 0;
-    $el.on('pointermove', function (e) {
-      if (e.target.closest && e.target.closest('.no-ripple')) return;
-
-      const now = Date.now();
-      if (now - lastTime < cfg.throttleMs) return;
-      lastTime = now;
-
-      const rect = this.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      $el.ripples('drop', x, y, Math.max(8, cfg.dropRadius * 0.6), 0.02);
-    });
-
-    $el.on('click', function (e) {
-      if (e.target.closest && e.target.closest('.no-ripple')) return;
-      const rect = this.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      $el.ripples('drop', x, y, cfg.dropRadius * 1.4, 0.06);
-    });
-
-    window.addEventListener('resize', () => {
-      destroyRipples();
-      if (supportsWebGL) initRipples();
-    });
-
-    return () => {
-      destroyRipples();
-    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   return (
-    <div
-      ref={rippleRef}
-      style={{
-        minHeight: '100vh',
-        backgroundImage:
-          "url('https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=1600&auto=format&fit=crop')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        overflow: 'hidden'
-      }}
-    >
-      <div className='bg-gray-50/80 min-h-screen'>
-        <ToastContainer />
-        {token === '' ? (
-          <Login setToken={setToken} />
-        ) : (
-          <>
-            <Navbar setToken={setToken} />
-            <hr />
-            <div className='flex w-full'>
-              <Sidebar />
-              <div className='w-[70%] mx-auto ml-[max(5vw,25px)] my-8 text-gray-600 text-base'>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      
+      {token === "" ? (
+        <Login setToken={setToken} />
+      ) : (
+        <div className="flex h-screen overflow-hidden">
+          {/* Sidebar */}
+          <div className={`
+            fixed lg:static inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out
+            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          `}>
+            <Sidebar setSidebarOpen={setSidebarOpen} />
+          </div>
+          
+          {/* Main Content */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <Navbar setToken={setToken} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+            
+            {/* Overlay for mobile sidebar */}
+            {sidebarOpen && (
+              <div 
+                className="fixed inset-0 bg-gray-900 bg-opacity-50 z-40 lg:hidden"
+                onClick={() => setSidebarOpen(false)}
+              ></div>
+            )}
+            
+            <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 lg:p-6">
+              <div className="container mx-auto px-2 sm:px-4">
                 <Routes>
-                  <Route path='/add' element={<Add token={token} />} />
-                  <Route path='/notes' element={<Notes token={token} />} />
-                  <Route path='/users' element={<Users token={token} />} />
+                  <Route path="/" element={<Dashboard token={token} />} />
+                  <Route path="/add" element={<Add token={token} />} />
+                  <Route path="/notes" element={<Notes token={token} />} />
+                  <Route path="/users" element={<Users token={token} />} />
+                  <Route path="/pyq" element={<Pyq token={token} />} />
                 </Routes>
               </div>
-            </div>
-          </>
-        )}
-      </div>
+            </main>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

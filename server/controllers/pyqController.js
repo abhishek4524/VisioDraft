@@ -1,9 +1,11 @@
 import Pyq from '../models/pyqModel.js';
+import path from 'path';
+import fs from 'fs';
 
 // Upload PYQ (Admin only)
 export const uploadPyq = async (req, res, next) => {
   try {
-    const { title,description, course, semester, branch, subject, year,uploadedBy } = req.body;
+    const { title, description, course, semester, branch, subject, year, uploadedBy } = req.body;
     
     if (!req.file) {
       return res.status(400).json({ success: false, message: "No file uploaded" });
@@ -17,7 +19,7 @@ export const uploadPyq = async (req, res, next) => {
       branch,
       year,
       subject,
-      file: req.file.path,
+      file: req.file.path,   // local file path
       uploadedBy
     });
 
@@ -35,7 +37,6 @@ export const uploadPyq = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-  
 };
 
 // Get all PYQs (Public)
@@ -60,3 +61,29 @@ export const getPyqById = async (req, res, next) => {
     next(error);
   }
 };
+
+// ✅ Download PYQ (Public)
+export const downloadPyq = async (req, res, next) => {
+  try {
+    const pyq = await Pyq.findById(req.params.id);
+    if (!pyq) {
+      return res.status(404).json({ success: false, message: "PYQ not found" });
+    }
+
+    const filePath = path.resolve(pyq.file);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ success: false, message: "File not found on server" });
+    }
+
+    // ✅ Increase download count
+    pyq.downloadCount += 1;
+    console.log(`Download count for PYQ ${pyq._id} increased to ${pyq.downloadCount}`);
+    await pyq.save();
+
+    res.download(filePath, `${pyq.title}_${pyq.year}.pdf`); 
+  } catch (error) {
+    next(error);
+  }
+};
+

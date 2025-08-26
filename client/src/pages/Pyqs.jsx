@@ -6,10 +6,11 @@ import Search from "../components/Search";
 import Footer from "../components/Footer";
 import { backendUrl } from "../App";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { Link } from "react-router-dom";
 
 const Pyqs = () => {
-  const [allPyqs, setAllPyqs] = useState([]); // Store all PYQs initially fetched
-  const [pyqs, setPyqs] = useState([]); // Store filtered PYQs
+  const [allPyqs, setAllPyqs] = useState([]);
+  const [pyqs, setPyqs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
@@ -19,7 +20,6 @@ const Pyqs = () => {
     branch: null,
   });
 
-  // Available filter options
   const courses = ["BTECH", "MBA", "MCA", "MTECH"];
   const branches = ["CS", "IT", "ME", "EC", "EE", "CE"];
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -50,7 +50,6 @@ const Pyqs = () => {
     fetchPyqs();
   }, []);
 
-  // Apply filters whenever filters or searchQuery changes
   useEffect(() => {
     if (allPyqs.length > 0) {
       const filtered = allPyqs.filter((pyq) => {
@@ -101,36 +100,63 @@ const Pyqs = () => {
     setSearchQuery("");
   };
 
-  // Count active filters
   const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen w-full bg-gradient-to-b from-gray-50 to-gray-100">
       <Navbar />
       <div className="pt-24 pb-8 w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        {/* Hero Section */}
+        <div className="mb-12 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
             Previous Year Questions
           </h1>
-          <p className="text-gray-600">
-            Access question papers from previous years to help with your exam
-            preparation
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            Access a comprehensive collection of past exam papers to supercharge
+            your preparation
           </p>
         </div>
 
-        <Search
-          placeholder="Search PYQs by subject or code..."
-          onSearch={handleSearch}
-        />
+        {/* Search with animated background */}
+        <div className="relative mb-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-lg transform -skew-y-1 -rotate-1"></div>
+          <div className="relative bg-white rounded-xl shadow-xl p-1">
+            <Search
+              placeholder="Search PYQs by subject, code, or year..."
+              onSearch={handleSearch}
+            />
+          </div>
+        </div>
 
         {/* Filter Sections */}
-        <div className="mt-8 bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-200">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-800">Filter PYQs</h2>
+        <div className="mt-8 bg-white rounded-2xl shadow-xl p-6 mb-8 border border-gray-100">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+              <h2 className="text-xl font-bold text-gray-800 flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 mr-2 text-indigo-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                  />
+                </svg>
+                Filter PYQs
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Narrow down by course, branch, semester or year
+              </p>
+            </div>
             {activeFilterCount > 0 && (
               <button
                 onClick={clearFilters}
-                className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+                className="flex items-center text-sm font-medium text-white bg-gradient-to-r from-red-500 to-pink-600 px-4 py-2 rounded-lg shadow hover:shadow-md transition-all"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -151,7 +177,7 @@ const Pyqs = () => {
             )}
           </div>
 
-          <div className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <FilterSection
               title="Course"
               items={courses}
@@ -160,21 +186,16 @@ const Pyqs = () => {
               icon={
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className="h-5 w-5 text-blue-500"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
                   <path d="M12 14l9-5-9-5-9 5 9 5z" />
                   <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
-                  />
                 </svg>
               }
+              color="blue"
             />
 
             <FilterSection
@@ -185,7 +206,7 @@ const Pyqs = () => {
               icon={
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className="h-5 w-5 text-green-500"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -194,10 +215,11 @@ const Pyqs = () => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+                    d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"
                   />
                 </svg>
               }
+              color="green"
             />
 
             <FilterSection
@@ -208,7 +230,7 @@ const Pyqs = () => {
               icon={
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className="h-5 w-5 text-purple-500"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -221,6 +243,7 @@ const Pyqs = () => {
                   />
                 </svg>
               }
+              color="purple"
             />
 
             <FilterSection
@@ -231,7 +254,7 @@ const Pyqs = () => {
               icon={
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className="h-5 w-5 text-amber-500"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -244,50 +267,64 @@ const Pyqs = () => {
                   />
                 </svg>
               }
+              color="amber"
             />
           </div>
         </div>
 
         {/* Results Section */}
         <div className="mt-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold text-gray-900">
-              {loading
-                ? "Loading..."
-                : `${pyqs.length} ${
-                    pyqs.length === 1 ? "Paper" : "Papers"
-                  } Found`}
-              {activeFilterCount > 0 && !loading && (
-                <span className="text-sm font-normal text-gray-500 ml-2">
-                  (filtered)
-                </span>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                {loading
+                  ? "Loading..."
+                  : `${pyqs.length} ${
+                      pyqs.length === 1 ? "Paper" : "Papers"
+                    } Found`}
+                {activeFilterCount > 0 && !loading && (
+                  <span className="text-sm font-normal text-gray-500 ml-2">
+                    (filtered)
+                  </span>
+                )}
+              </h2>
+              {!loading && (
+                <p className="text-sm text-gray-500 mt-1">
+                  {pyqs.length > 0
+                    ? "Browse and download the papers you need"
+                    : "No papers match your current filters"}
+                </p>
               )}
-            </h2>
-
-            <div className="flex items-center space-x-3">
-              <span className="text-sm text-gray-500">Sort by:</span>
-              <select
-                className="text-sm border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onChange={(e) => {
-                  // Implement sorting logic here if needed
-                  const sorted = [...pyqs];
-                  if (e.target.value === "recent") {
-                    sorted.sort((a, b) => new Date(b.year) - new Date(a.year));
-                  } else if (e.target.value === "downloads") {
-                    sorted.sort(
-                      (a, b) => (b.downloadCount || 0) - (a.downloadCount || 0)
-                    );
-                  } else if (e.target.value === "title") {
-                    sorted.sort((a, b) => a.title.localeCompare(b.title));
-                  }
-                  setPyqs(sorted);
-                }}
-              >
-                <option value="recent">Most Recent</option>
-                <option value="downloads">Most Downloads</option>
-                <option value="title">Alphabetical</option>
-              </select>
             </div>
+
+            {!loading && pyqs.length > 0 && (
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-gray-500">Sort by:</span>
+                <select
+                  className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+                  onChange={(e) => {
+                    const sorted = [...pyqs];
+                    if (e.target.value === "recent") {
+                      sorted.sort(
+                        (a, b) => new Date(b.year) - new Date(a.year)
+                      );
+                    } else if (e.target.value === "downloads") {
+                      sorted.sort(
+                        (a, b) =>
+                          (b.downloadCount || 0) - (a.downloadCount || 0)
+                      );
+                    } else if (e.target.value === "title") {
+                      sorted.sort((a, b) => a.title.localeCompare(b.title));
+                    }
+                    setPyqs(sorted);
+                  }}
+                >
+                  <option value="recent">Most Recent</option>
+                  <option value="downloads">Most Downloads</option>
+                  <option value="title">Alphabetical</option>
+                </select>
+              </div>
+            )}
           </div>
 
           {loading ? (
@@ -301,22 +338,24 @@ const Pyqs = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-200">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-12 w-12 mx-auto text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <h3 className="mt-4 text-lg font-medium text-gray-900">
+            <div className="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
+              <div className="mx-auto h-24 w-24 flex items-center justify-center rounded-full bg-gradient-to-r from-pink-100 to-purple-100 mb-6">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-12 w-12 text-pink-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="mt-4 text-xl font-bold text-gray-900">
                 No PYQs found
               </h3>
               <p className="mt-2 text-gray-500 max-w-md mx-auto">
@@ -327,7 +366,7 @@ const Pyqs = () => {
               {(activeFilterCount > 0 || searchQuery) && (
                 <button
                   onClick={clearFilters}
-                  className="mt-6 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center mx-auto"
+                  className="mt-6 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:shadow-md transition-all flex items-center mx-auto font-medium"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -343,7 +382,7 @@ const Pyqs = () => {
                       d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                     />
                   </svg>
-                  Reset All
+                  Reset All Filters
                 </button>
               )}
             </div>
@@ -355,23 +394,52 @@ const Pyqs = () => {
   );
 };
 
-// Filter Section Component
-const FilterSection = ({ title, items, activeItem, onClick, icon }) => {
+const FilterSection = ({
+  title,
+  items,
+  activeItem,
+  onClick,
+  icon,
+  color = "blue",
+}) => {
+  const colorClasses = {
+    blue: {
+      active: "bg-blue-600 text-white",
+      inactive: "bg-blue-50 text-blue-700 hover:bg-blue-100",
+      icon: "text-blue-500",
+    },
+    green: {
+      active: "bg-green-600 text-white",
+      inactive: "bg-green-50 text-green-700 hover:bg-green-100",
+      icon: "text-green-500",
+    },
+    purple: {
+      active: "bg-purple-600 text-white",
+      inactive: "bg-purple-50 text-purple-700 hover:bg-purple-100",
+      icon: "text-purple-500",
+    },
+    amber: {
+      active: "bg-amber-600 text-white",
+      inactive: "bg-amber-50 text-amber-700 hover:bg-amber-100",
+      icon: "text-amber-500",
+    },
+  };
+
   return (
     <div>
       <div className="flex items-center mb-3">
-        <div className="text-gray-500 mr-2">{icon}</div>
-        <h3 className="text-md font-medium text-gray-700">{title}</h3>
+        <div className={`mr-2 ${colorClasses[color].icon}`}>{icon}</div>
+        <h3 className="text-md font-semibold text-gray-700">{title}</h3>
       </div>
       <div className="flex flex-wrap gap-2">
         {items.map((item, index) => (
           <button
             key={index}
             onClick={() => onClick(item)}
-            className={`px-3 py-1.5 text-sm rounded-md transition-all duration-200 flex items-center ${
+            className={`px-3 py-1.5 text-sm rounded-lg transition-all duration-200 flex items-center ${
               activeItem === item
-                ? "bg-blue-600 text-white shadow-md"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? `${colorClasses[color].active} shadow-md`
+                : colorClasses[color].inactive
             }`}
           >
             {item}
@@ -398,53 +466,63 @@ const FilterSection = ({ title, items, activeItem, onClick, icon }) => {
   );
 };
 
-// PYQ Card Component
 const PyqCard = ({ data }) => {
-  const handleDownload = async () => {
-    try {
-      // Increment download count and get download URL
-      const response = await axios.get(
-        `${backendUrl}/api/pyqs/${data._id}/download`
-      );
-      if (response.data.success) {
-        // Trigger file download
-        window.open(response.data.downloadUrl, "_blank");
-      }
-    } catch (error) {
-      console.error("Download error:", error);
-      toast.error(error.response?.data?.message || "Failed to download file");
-    }
+const handleDownload = async () => {
+  try {
+    const response = await axios.get(
+      `${backendUrl}/api/pyqs/download/${data._id}`,
+      { responseType: "blob" }  // 👈 important
+    );
+
+    // Create file blob
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+
+    // Create a link & click programmatically
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `${data.title}_${data.year}.pdf`); // 👈 filename
+    document.body.appendChild(link);
+    link.click();
+
+    // Cleanup
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Download error:", error);
+    toast.error(error.response?.data?.message || "Failed to download file");
+  };
+
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-200 hover:border-blue-200 group">
+    <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100 group transform hover:-translate-y-1 transition-transform duration-200">
       <div className="p-5">
         <div className="flex justify-between items-start mb-3">
           <div>
-            <h3 className="font-semibold text-lg text-gray-900 mb-1 group-hover:text-blue-600 transition">
+            <h3 className="font-bold text-lg text-gray-900 mb-1 group-hover:text-blue-600 transition">
               {data.title}
             </h3>
             {data.subjectCode && (
-              <span className="text-xs text-gray-500 font-mono">
+              <span className="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded">
                 {data.subjectCode}
               </span>
             )}
           </div>
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800">
             {data.year}
           </span>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-4">
-          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
             {data.course}
           </span>
           {data.branch && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-green-700">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
               {data.branch}
             </span>
           )}
-          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-50 text-purple-700">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
             Sem {data.semester}
           </span>
         </div>
@@ -453,7 +531,7 @@ const PyqCard = ({ data }) => {
           <div className="flex items-center text-sm text-gray-500">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 mr-1"
+              className="h-4 w-4 mr-1 text-gray-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -467,18 +545,14 @@ const PyqCard = ({ data }) => {
             </svg>
             {(data.downloadCount || 0).toLocaleString()} downloads
           </div>
-          <a
-            href={data.url || "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            download
+          <Link
             onClick={handleDownload}
-            className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
           >
             Download
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 ml-1"
+              className="h-4 w-4 ml-2"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -490,7 +564,7 @@ const PyqCard = ({ data }) => {
                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
               />
             </svg>
-          </a>
+          </Link>
         </div>
       </div>
     </div>

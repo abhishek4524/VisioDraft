@@ -9,7 +9,7 @@ const userRouter = express.Router();
 
 userRouter.post("/register", registerUser);
 userRouter.post("/setup-profile", setupProfile);
-userRouter.post("/list-users", listUsers);
+userRouter.get("/list-users", listUsers);
 userRouter.get("/user-profile",userAuth, getUser);
 userRouter.post("/edit-profile",userAuth, updateUser);
 userRouter.post("/login", loginUser);

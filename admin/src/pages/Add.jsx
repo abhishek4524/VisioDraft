@@ -33,7 +33,8 @@ const Add = () => {
     if (selectedFile) {
       // Check file size (max 10MB)
       if (selectedFile.size > 10 * 1024 * 1024) {
-        alert("File size should be less than 10MB");
+        toast.error("File size should be less than 10MB");
+        e.target.value = ""; // Clear the file input
         return;
       }
       // Check file type
@@ -45,7 +46,8 @@ const Add = () => {
         "application/vnd.openxmlformats-officedocument.presentationml.presentation",
       ];
       if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Only PDF, DOC, DOCX, PPT, PPTX files are allowed");
+        toast.error("Only PDF, DOC, DOCX, PPT, PPTX files are allowed");
+        e.target.value = ""; // Clear the file input
         return;
       }
       setFile(selectedFile);
@@ -54,6 +56,11 @@ const Add = () => {
 
   const removeFile = () => {
     setFile(null);
+    // Reset the file input
+    const fileInput = document.querySelector('input[type="file"]');
+    if (fileInput) {
+      fileInput.value = "";
+    }
   };
 
   const onSubmitHandler = async (e) => {
@@ -61,15 +68,19 @@ const Add = () => {
 
     // Validation
     if (!file) {
-      alert("Please select a file to upload");
+      toast.error("Please select a file to upload");
       return;
     }
     if (!title.trim()) {
-      alert("Please enter a title");
+      toast.error("Please enter a title");
       return;
     }
     if (!subject.trim()) {
-      alert("Please enter a subject");
+      toast.error("Please enter a subject");
+      return;
+    }
+    if (!uploadedBy.trim()) {
+      toast.error("Please enter uploader name");
       return;
     }
 
@@ -110,6 +121,12 @@ const Add = () => {
       setYear("2024");
       setSubject("");
       setUploadedBy("");
+      
+      // Reset the file input
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput) {
+        fileInput.value = "";
+      }
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Upload failed. Please try again."
@@ -208,6 +225,7 @@ const Add = () => {
                   className="hidden"
                   onChange={handleFileChange}
                   accept=".pdf,.doc,.docx,.ppt,.pptx"
+                  required
                 />
               </label>
             )}
@@ -370,7 +388,7 @@ const Add = () => {
               htmlFor="uploadedBy"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Upload By*
+              Uploaded By*
             </label>
             <input
               type="text"

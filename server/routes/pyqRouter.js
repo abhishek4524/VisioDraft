@@ -1,5 +1,5 @@
 import express from 'express';
-import { uploadPyq, getAllPyqs, getPyqById } from '../controllers/pyqController.js';
+import { uploadPyq, getAllPyqs, getPyqById, downloadPyq } from '../controllers/pyqController.js';
 import verifyAdmin from '../middleware/adminAuth.js';
 import upload from '../config/multerConfig.js';
 
@@ -11,5 +11,6 @@ router.post('/upload', verifyAdmin, upload.single('file'), uploadPyq);
 // Public routes
 router.get('/', getAllPyqs);
 router.get('/:id', getPyqById);
+router.get('/download/:id', downloadPyq);   // ✅ Download route added
 
 export default router;

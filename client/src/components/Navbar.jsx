@@ -13,13 +13,6 @@ const Navbar = () => {
     setMenuOpen(!menuOpen);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setToken("");
-    setMenuOpen(false);
-    window.location.href = "/";
-  };
-
   useEffect(() => {
     const handleStorageChange = () => {
       setToken(localStorage.getItem("token") || "");
@@ -31,221 +24,197 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      setScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const navItems = ["PYQs", "Notes", "Upload Notes", "Ask AI", "Community"];
+
   return (
     <nav
-      className={`w-full fixed top-0 left-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-white shadow-md" : "bg-transparent"
+      className={`fixed w-full top-0 left-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-white/90 backdrop-blur-md shadow-sm"
+          : "bg-transparent backdrop-blur-none"
       }`}
+      style={{ transform: 'translateY(0)' }}
     >
-      <div className="flex items-center justify-between px-4 md:px-10 py-4 relative">
-        {/* Mobile Hamburger - Moved to left side */}
-        <div className="md:hidden flex items-center">
-          <button onClick={toggleMenu} className="mr-2">
-            {menuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
-          
-          {/* Logo - Moved next to hamburger on mobile */}
-          <Link to="/" className="w-1/2 md:w-auto">
-            <img src={assets.logo} alt="Logo" className="w-32 md:w-40" />
-          </Link>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 md:h-20">
+          {/* Mobile menu button and logo */}
+          <div className="flex items-center md:hidden">
+            <button
+              onClick={toggleMenu}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 focus:outline-none active:scale-90"
+            >
+              {menuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
+            
+            <Link to="/" className="ml-4">
+              <img
+                src={assets.logo}
+                alt="Logo"
+                className="h-8 w-auto"
+              />
+            </Link>
+          </div>
+
+          {/* Desktop logo */}
+          <div className="hidden md:flex items-center">
+            <Link to="/">
+              <img
+                src={assets.logo}
+                alt="Logo"
+                className="h-10 w-auto hover:scale-105 transition-transform"
+              />
+            </Link>
+          </div>
+
+          {/* Desktop navigation */}
+          <div className="hidden md:flex items-center space-x-1">
+            <div className="hidden md:flex items-center space-x-1">
+              {navItems.map((item, index) => {
+                const path = `/${item.toLowerCase().replace(/\s+/g, "-")}`;
+                const isActive = location.pathname === path;
+
+                return (
+                  <div
+                    key={index}
+                    className="hover:-translate-y-0.5 transition-transform"
+                  >
+                    <Link
+                      to={path}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                        isActive
+                          ? "bg-blue-100 text-blue-600"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      }`}
+                    >
+                      {item}
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Desktop auth buttons */}
+          <div className="hidden md:flex items-center space-x-3 ml-4">
+            {token ? (
+              <>
+                <div className="hover:scale-105 active:scale-95 transition-transform">
+                  <Link
+                    to="/profile"
+                    className="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 shadow-sm"
+                  >
+                    <UserRound className="h-5 w-5 text-white" />
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="hover:scale-105 active:scale-95 transition-transform">
+                  <Link
+                    to="/login"
+                    className="px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-100 transition-all duration-200"
+                  >
+                    Log in
+                  </Link>
+                </div>
+                
+                <div className="hover:scale-105 active:scale-95 transition-transform">
+                  <Link
+                    to="/signup"
+                    className="px-4 py-2 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-sm font-medium shadow-sm hover:shadow-md transition-all duration-200"
+                  >
+                    Sign up
+                  </Link>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Mobile auth button */}
+          {token && (
+            <div className="md:hidden flex items-center">
+              <div className="hover:scale-110 active:scale-90 transition-transform">
+                <Link
+                  to="/profile"
+                  className="flex items-center justify-center h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 shadow-sm"
+                >
+                  <UserRound className="h-4 w-4 text-white" />
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
+      </div>
 
-        {/* Desktop Logo - Hidden on mobile */}
-        <Link to="/" className="hidden md:block w-1/2 md:w-auto">
-          <img src={assets.logo} alt="Logo" className="w-32 md:w-40" />
-        </Link>
-
-        {/* Desktop Nav Links */}
-        <ul className="hidden md:flex items-center gap-6 lg:gap-12 text-base md:text-lg">
-          {["PYQs", "Notes", "Upload Notes", "Ask AI", "Community"].map((text, index) => {
-            const path = `/${text.toLowerCase().replace(/\s+/g, "-")}`;
+      {/* Mobile menu */}
+      <div
+        className={`md:hidden bg-white shadow-lg overflow-hidden transition-all duration-300 ${
+          menuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div className="px-4 pt-2 pb-6 space-y-2">
+          {navItems.map((item, index) => {
+            const path = `/${item.toLowerCase().replace(/\s+/g, "-")}`;
             const isActive = location.pathname === path;
 
             return (
-              <li
+              <div
                 key={index}
-                className={`hover:scale-105 hover:font-semibold hover:text-blue-600 transition duration-200 ease-in-out ${
-                  isActive ? "text-blue-500 font-semibold" : ""
-                }`}
+                style={{ 
+                  transitionDelay: `${index * 50}ms`,
+                  transform: 'translateX(0)',
+                  opacity: 1
+                }}
               >
-                <Link to={path}>{text}</Link>
-              </li>
+                <Link
+                  to={path}
+                  onClick={() => setMenuOpen(false)}
+                  className={`block px-4 py-3 rounded-lg text-base font-medium ${
+                    isActive
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  {item}
+                </Link>
+              </div>
             );
           })}
-        </ul>
 
-        {/* Desktop Auth Buttons */}
-        <div className="hidden md:flex items-center gap-3">
-          {token ? (
-            <>
-              {/* User Profile Icon - Desktop */}
-              <Link to="/profile" className="
-                h-12 w-12 
-                rounded-full 
-                bg-gradient-to-br from-gray-800 to-black
-                shadow-lg
-                border-2 border-white/20
-                flex items-center justify-center
-                cursor-pointer
-                hover:scale-105
-                hover:shadow-xl
-                hover:border-white/30
-                active:scale-95
-                transition-all duration-200 ease-in-out
-                group
-              ">
-                <UserRound className="
-                  h-6 w-6 
-                  text-gray-300 
-                  group-hover:text-white
-                  transition-colors duration-200
-                " />
-              </Link>
-              
-              <button
-                onClick={handleLogout}
-                className="
-                  bg-gradient-to-br from-red-500 to-red-600
-                  px-5 py-2.5
-                  rounded-full
-                  text-white font-medium
-                  shadow-md hover:shadow-lg
-                  transform hover:scale-105 active:scale-95
-                  transition-all duration-200 ease-in-out
-                  focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75
-                  flex items-center justify-center
-                  space-x-2
-                "
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                  />
-                </svg>
-                <span>Logout</span>
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/login"
-                className="bg-gray-300 px-4 py-2 rounded-full text-sm hover:scale-105 transition"
-              >
-                Log in
-              </Link>
-              <Link
-                to="/signup"
-                className="bg-blue-600 px-4 py-2 text-white rounded-full text-sm hover:scale-105 transition"
-              >
-                Sign up
-              </Link>
-            </>
-          )}
-        </div>
-
-        {/* Mobile User Profile Icon - Only shown when logged in */}
-        {token && (
-          <div className="md:hidden
-            h-10 w-10 
-            rounded-full 
-            bg-gradient-to-br from-gray-800 to-black
-            shadow-md
-            border border-white/20
-            flex items-center justify-center
-            cursor-pointer
-            hover:scale-105
-            active:scale-95
-            transition-all duration-200 ease-in-out
-          ">
-            <Link to="/profile"><UserRound className="h-5 w-5 text-gray-300" /></Link>
-          </div>
-        )}
-      </div>
-
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="md:hidden bg-white shadow-inner">
-          <ul className="flex flex-col items-center gap-4 py-4 text-base">
-            {["PYQs", "Notes", "Upload Notes", "Ask AI", "Community"].map((text, index) => (
-              <li key={index} className="hover:text-blue-600 transition">
-                <Link
-                  to={`/${text.toLowerCase().replace(/\s+/g, "-")}`}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {text}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <div className="flex flex-col items-center gap-4 pb-4">
-            {token ? (
-              <button
-                onClick={handleLogout}
-                className="
-                  bg-gradient-to-br from-red-500 to-red-600
-                  px-5 py-2.5
-                  rounded-full
-                  text-white font-medium
-                  shadow-md hover:shadow-lg
-                  transform hover:scale-105 active:scale-95
-                  transition-all duration-200 ease-in-out
-                  focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75
-                  flex items-center justify-center
-                  space-x-2
-                "
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                  />
-                </svg>
-                <span>Logout</span>
-              </button>
-            ) : (
+          <div className="pt-4 border-t border-gray-200">
+            {!token && (
               <>
-                <Link
-                  to="/login"
-                  className="bg-gray-300 px-4 py-2 rounded-full text-sm hover:scale-105 transition"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Log in
-                </Link>
-                <Link
-                  to="/signup"
-                  className="bg-blue-600 px-4 py-2 text-white rounded-full text-sm hover:scale-105 transition"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Sign up
-                </Link>
+                <div className="space-y-3" style={{ opacity: 1 }}>
+                  <Link
+                    to="/login"
+                    onClick={() => setMenuOpen(false)}
+                    className="block w-full px-4 py-3 rounded-full text-center text-base font-medium text-gray-700 hover:bg-gray-100"
+                  >
+                    Log in
+                  </Link>
+                  <Link
+                    to="/signup"
+                    onClick={() => setMenuOpen(false)}
+                    className="block w-full px-4 py-3 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-base font-medium shadow-sm hover:shadow-md"
+                  >
+                    Sign up
+                  </Link>
+                </div>
               </>
             )}
           </div>
         </div>
-      )}
+      </div>
     </nav>
   );
 };

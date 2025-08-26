@@ -19,7 +19,6 @@ const branchData = {
   msc: ["Physics", "Chemistry", "Biology", "Maths"],
 };
 
-// ✅ FIXED subjectData closing brackets
 const subjectData = {
   btech: {
     1: [
@@ -89,9 +88,8 @@ const UploadNotes = () => {
     }
   }, [formData.course, formData.semester]);
 
-  const [branches, setBranches] = useState([]); // for dynamic branch options
+  const [branches, setBranches] = useState([]);
 
-  // ✅ Reset branch when course changes
   useEffect(() => {
     if (formData.course) {
       setBranches(branchData[formData.course] || []);
@@ -193,21 +191,32 @@ const UploadNotes = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 mt-20">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-indigo-50 py-10">
       <ToastContainer position="top-right" autoClose={5000} />
       <Navbar />
 
       <main className="flex-grow container mx-auto px-4 py-12 max-w-4xl">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-            Share Your Knowledge
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+            Share Your <span className="text-blue-600">Knowledge</span>
           </h1>
-          <p className="text-gray-600 max-w-lg mx-auto">
-            Upload your study notes to help fellow students.
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Upload your study notes and help thousands of students learn better.
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md overflow-hidden p-6 md:p-8">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden p-6 md:p-8 border border-gray-100">
+          <div className="mb-8">
+            <div className="flex items-center justify-center mb-4">
+              <div className="p-3 bg-blue-100 rounded-full">
+                <FiUpload className="text-blue-600 text-2xl" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-center text-gray-800">
+              Upload New Notes
+            </h2>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 flex items-center">
@@ -219,8 +228,8 @@ const UploadNotes = () => {
                 value={formData.title}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                placeholder="Enter title for your notes"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-gray-50 hover:bg-white"
+                placeholder="Enter a descriptive title for your notes"
               />
             </div>
 
@@ -235,7 +244,7 @@ const UploadNotes = () => {
                   value={formData.course}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-gray-50 hover:bg-white"
                 >
                   <option value="" disabled>
                     Select Course
@@ -260,7 +269,7 @@ const UploadNotes = () => {
                   onChange={handleChange}
                   required
                   disabled={!formData.course}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition disabled:opacity-50"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-gray-50 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="" disabled>
                     Select Semester
@@ -273,7 +282,7 @@ const UploadNotes = () => {
                 </select>
               </div>
             </div>
-            {/* Branch Dropdown */}
+
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 flex items-center">
                 <FiBook className="mr-2 text-blue-600" />
@@ -285,7 +294,7 @@ const UploadNotes = () => {
                 onChange={handleChange}
                 required
                 disabled={!formData.course}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition disabled:opacity-50"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-gray-50 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <option value="" disabled>
                   Select Branch
@@ -309,7 +318,7 @@ const UploadNotes = () => {
                 onChange={handleChange}
                 required
                 disabled={!formData.semester || subjects.length === 0}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition disabled:opacity-50"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-gray-50 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <option value="" disabled>
                   Select Subject
@@ -332,7 +341,7 @@ const UploadNotes = () => {
                 value={formData.noteType}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-gray-50 hover:bg-white"
               >
                 <option value="" disabled>
                   Select Note Type
@@ -351,20 +360,24 @@ const UploadNotes = () => {
                 <FiUpload className="mr-2 text-blue-600" />
                 Notes File (PDF preferred)
               </label>
-              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
-                <div className="space-y-1 text-center">
-                  {preview && (
+              <div className="mt-1 flex justify-center px-6 pt-8 pb-8 border-2 border-gray-200 border-dashed rounded-xl bg-gray-50 hover:bg-white transition cursor-pointer relative group">
+                <div className="space-y-2 text-center">
+                  {preview ? (
                     <div className="mb-4">
                       <img
                         src={preview}
                         alt="Preview"
-                        className="mx-auto h-32 object-contain"
+                        className="mx-auto h-32 object-contain rounded-lg shadow-sm"
                       />
                     </div>
+                  ) : (
+                    <div className="mx-auto h-16 w-16 text-gray-400 group-hover:text-blue-500 transition">
+                      <FiUpload className="w-full h-full" />
+                    </div>
                   )}
-                  <div className="flex text-sm text-gray-600">
-                    <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
-                      <span>Upload a file</span>
+                  <div className="flex flex-col items-center justify-center text-sm text-gray-600">
+                    <label className="relative cursor-pointer font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
+                      <span>Click to upload</span>
                       <input
                         type="file"
                         className="sr-only"
@@ -373,16 +386,19 @@ const UploadNotes = () => {
                         required
                       />
                     </label>
-                    <p className="pl-1">or drag and drop</p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      or drag and drop files here
+                    </p>
                   </div>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 mt-2">
                     PDF, DOC, JPG, PNG up to 10MB
                   </p>
                 </div>
               </div>
               {formData.file && (
-                <p className="text-sm text-gray-500 mt-1">
-                  Selected file: {formData.file.name} (
+                <p className="text-sm text-gray-500 mt-2 px-2 py-1 bg-blue-50 rounded-md inline-block">
+                  <span className="font-medium">Selected file:</span>{" "}
+                  {formData.file.name} (
                   {(formData.file.size / 1024 / 1024).toFixed(2)} MB)
                 </p>
               )}
@@ -392,8 +408,8 @@ const UploadNotes = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ${
-                  isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                className={`w-full flex justify-center items-center py-4 px-6 border border-transparent rounded-xl shadow-sm text-lg font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ${
+                  isSubmitting ? "opacity-80 cursor-not-allowed" : ""
                 }`}
               >
                 {isSubmitting ? (
@@ -410,8 +426,10 @@ const UploadNotes = () => {
                         r="10"
                         stroke="currentColor"
                         strokeWidth="4"
+                        className="opacity-25"
                       ></circle>
                       <path
+                        className="opacity-75"
                         fill="currentColor"
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
@@ -419,7 +437,10 @@ const UploadNotes = () => {
                     Uploading...
                   </>
                 ) : (
-                  "Upload Notes"
+                  <>
+                    <FiUpload className="mr-2" />
+                    Upload Notes
+                  </>
                 )}
               </button>
             </div>

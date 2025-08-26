@@ -41,6 +41,10 @@ const pyqSchema = new mongoose.Schema({
   },
   uploadedBy: {
     type: String,
+  },
+    downloadCount: {
+    type: Number,
+    default: 0,
   }
 }, { timestamps: true });
 

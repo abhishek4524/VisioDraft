@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { useNavigate, Link } from "react-router-dom";
 import { backendUrl } from "../App";
 import { FiUser, FiMail, FiLock, FiBook, FiArrowRight } from "react-icons/fi";
+import Navbar from "../components/Navbar";
 
 const Signup = ({ setToken }) => {
   const [formData, setFormData] = useState({
@@ -55,8 +56,11 @@ const Signup = ({ setToken }) => {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post(`${backendUrl}/api/user/register`, formData);
-      
+      const response = await axios.post(
+        `${backendUrl}/api/user/register`,
+        formData
+      );
+
       if (response.data.success) {
         toast.success("Registration successful!");
         localStorage.setItem("token", response.data.token);
@@ -77,26 +81,13 @@ const Signup = ({ setToken }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <Navbar />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="text-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-12 w-12 mx-auto text-indigo-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-            />
-          </svg>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <div className="text-center mt-6">
+          <h2 className="text-center text-3xl font-extrabold text-gray-900">
             Create your account
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="text-center text-sm text-gray-600">
             Join our community of learners and professionals
           </p>
         </div>
@@ -205,7 +196,10 @@ const Signup = ({ setToken }) => {
                 />
               </div>
               <div className="ml-3 text-sm">
-                <label htmlFor="isStudent" className="font-medium text-gray-700">
+                <label
+                  htmlFor="isStudent"
+                  className="font-medium text-gray-700"
+                >
                   I am a student
                 </label>
               </div>
@@ -236,7 +230,9 @@ const Signup = ({ setToken }) => {
                   />
                 </div>
                 {errors.university && (
-                  <p className="mt-1 text-sm text-red-600">{errors.university}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.university}
+                  </p>
                 )}
               </div>
             )}
@@ -256,7 +252,10 @@ const Signup = ({ setToken }) => {
               <div className="ml-3 text-sm">
                 <label htmlFor="agree" className="font-medium text-gray-700">
                   I agree to the{" "}
-                  <Link to="/terms" className="text-indigo-600 hover:text-indigo-500">
+                  <Link
+                    to="/terms"
+                    className="text-indigo-600 hover:text-indigo-500"
+                  >
                     Terms & Conditions
                   </Link>
                 </label>

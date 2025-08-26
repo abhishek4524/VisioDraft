@@ -8,7 +8,7 @@ const quickLinks = [
   { label: 'Notes', path: '/notes', icon: <FiBook className="mr-2" /> },
   { label: 'Upload', path: '/upload-notes', icon: <FiUpload className="mr-2" /> },
   { label: 'Ask AI', path: '/ask-ai', icon: <FiMessageSquare className="mr-2" /> },
-  { label: 'Community', path: '/community"', icon: <RiUserCommunityLine className="mr-2" /> },
+  { label: 'Community', path: '/community', icon: <RiUserCommunityLine className="mr-2" /> },
 ];
 
 const QuickLinksBar = () => {
