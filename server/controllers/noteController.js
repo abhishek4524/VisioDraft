@@ -1,5 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import noteModel from "../models/noteModel.js";
+import path from "path";
+import fs from "fs";
 
 // ✅ Add a new note with only ONE file
 const addNote = async (req, res) => {
@@ -120,4 +122,45 @@ const singleNote = async (req, res) => {
   }
 };
 
-export { listNotes, addNote, removeNote, singleNote };
+
+// ✅ View Note (generate a viewable URL)
+const viewNote = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const note = await noteModel.findById(id);
+
+    if (!note) {
+      return res.status(404).json({ success: false, message: "Note not found" });
+    }
+
+    if (!note.file || note.file.length === 0) {
+      return res.status(404).json({ success: false, message: "No file found for this note" });
+    }
+
+    // Increment view count (optional)
+    note.views = (note.views || 0) + 1;
+    await note.save();
+
+    const fileUrl = note.file[0];
+    let viewUrl = fileUrl;
+
+    // ✅ Fix: Agar PDF hai to direct original URL bhejo
+    if (fileUrl.includes(".pdf")) {
+      viewUrl = fileUrl.replace("/image/upload", "/raw/upload");
+    }
+
+    res.json({
+      success: true,
+      viewUrl,
+    });
+  } catch (error) {
+    console.error("View Note Error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to load note",
+      error: error.message,
+    });
+  }
+};
+
+export { listNotes, addNote, removeNote, singleNote, viewNote };

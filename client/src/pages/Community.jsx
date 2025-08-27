@@ -139,7 +139,7 @@ const Community = () => {
 
           {/* Enhanced Create Community Button */}
           <Link 
-            to="/create-community"
+            to="/community/create"
             className="group relative bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-8 py-4 rounded-xl font-semibold 
               hover:from-blue-700 hover:to-indigo-800 transform transition-all duration-300 
               shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-3

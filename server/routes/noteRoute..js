@@ -4,9 +4,12 @@ import {
   addNote,
   removeNote,
   singleNote,
+  viewNote
+  
 } from "../controllers/noteController.js";
 import upload from "../middleware/multer.js";
 import userAuth from "../middleware/userAuth.js";
+
 
 const noteRouter = express.Router();
 
@@ -18,5 +21,7 @@ noteRouter.post(
 noteRouter.post("/remove", userAuth, removeNote);
 noteRouter.post("/single", singleNote);
 noteRouter.get("/list", listNotes);
+noteRouter.get("/:id/view", viewNote);
+
 
 export default noteRouter;

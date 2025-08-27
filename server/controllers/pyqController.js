@@ -1,14 +1,25 @@
-import Pyq from '../models/pyqModel.js';
-import path from 'path';
-import fs from 'fs';
+import Pyq from "../models/pyqModel.js";
+import path from "path";
+import fs from "fs";
 
 // Upload PYQ (Admin only)
 export const uploadPyq = async (req, res, next) => {
   try {
-    const { title, description, course, semester, branch, subject, year, uploadedBy } = req.body;
-    
+    const {
+      title,
+      description,
+      course,
+      semester,
+      branch,
+      subject,
+      year,
+      uploadedBy,
+    } = req.body;
+
     if (!req.file) {
-      return res.status(400).json({ success: false, message: "No file uploaded" });
+      return res
+        .status(400)
+        .json({ success: false, message: "No file uploaded" });
     }
 
     const newPyq = new Pyq({
@@ -19,20 +30,20 @@ export const uploadPyq = async (req, res, next) => {
       branch,
       year,
       subject,
-      file: req.file.path,   // local file path
-      uploadedBy
+      file: req.file.path, // local file path
+      uploadedBy,
     });
 
     await newPyq.save();
 
-    res.status(201).json({ 
-      success: true, 
+    res.status(201).json({
+      success: true,
       message: "PYQ uploaded successfully",
       data: {
         id: newPyq._id,
         title: newPyq.title,
-        file: newPyq.file
-      }
+        file: newPyq.file,
+      },
     });
   } catch (error) {
     next(error);
@@ -42,7 +53,9 @@ export const uploadPyq = async (req, res, next) => {
 // Get all PYQs (Public)
 export const getAllPyqs = async (req, res, next) => {
   try {
-    const pyqs = await Pyq.find().select('-__v').populate('uploadedBy', 'email');
+    const pyqs = await Pyq.find()
+      .select("-__v")
+      .populate("uploadedBy", "email");
     res.json({ success: true, data: pyqs });
   } catch (error) {
     next(error);
@@ -52,7 +65,7 @@ export const getAllPyqs = async (req, res, next) => {
 // Get single PYQ (Public)
 export const getPyqById = async (req, res, next) => {
   try {
-    const pyq = await Pyq.findById(req.params.id).select('-__v');
+    const pyq = await Pyq.findById(req.params.id).select("-__v");
     if (!pyq) {
       return res.status(404).json({ success: false, message: "PYQ not found" });
     }
@@ -73,17 +86,20 @@ export const downloadPyq = async (req, res, next) => {
     const filePath = path.resolve(pyq.file);
 
     if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ success: false, message: "File not found on server" });
+      return res
+        .status(404)
+        .json({ success: false, message: "File not found on server" });
     }
 
     // ✅ Increase download count
     pyq.downloadCount += 1;
-    console.log(`Download count for PYQ ${pyq._id} increased to ${pyq.downloadCount}`);
+    console.log(
+      `Download count for PYQ ${pyq._id} increased to ${pyq.downloadCount}`
+    );
     await pyq.save();
 
-    res.download(filePath, `${pyq.title}_${pyq.year}.pdf`); 
+    res.download(filePath, `${pyq.title}_${pyq.year}.pdf`);
   } catch (error) {
     next(error);
   }
 };
-

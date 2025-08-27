@@ -391,7 +391,7 @@ const UploadNotes = () => {
                     </p>
                   </div>
                   <p className="text-xs text-gray-500 mt-2">
-                    PDF, DOC, JPG, PNG up to 10MB
+                    JPG, PNG up to 10MB
                   </p>
                 </div>
               </div>

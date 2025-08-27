@@ -12,6 +12,7 @@ import SetupProfile from './pages/setupProfile';
 import UserProfile from './pages/UserProfile';
 import Chat from './pages/Chat';
 import Community from './pages/Community';
+import CreateCommunity from './pages/CreateCommunity';
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL
 
@@ -30,6 +31,7 @@ function App() {
         <Route path='/profile' element={<UserProfile />} />
         <Route path='/chat' element={<Chat />} />
         <Route path='/community' element={<Community />} />
+        <Route path='/community/create' element={<CreateCommunity />} />
       </Routes>
     </div>
   )

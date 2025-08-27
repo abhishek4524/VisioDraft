@@ -7,6 +7,7 @@ import connectCloudinary from './config/cloudinary.js';
 import userRouter from './routes/userRoute.js';
 import noteRouter from './routes/noteRoute..js';
 import pyqRouter from "./routes/pyqRouter.js";
+import communityRouter from "./routes/communityRoute.js";
 
 // App config
 const app = express();
@@ -19,15 +20,19 @@ connectCloudinary();
 // Middlewares
 app.use(express.json());
 app.use(cors());
-app.use(express.urlencoded({ extended: true })); // for x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true }));
 
 // API endpoints
 app.use('/api/user', userRouter);
 app.use('/api/note', noteRouter);
 app.use("/api/pyqs", pyqRouter);
+app.use('/api/community', communityRouter);
 
 app.get('/', (req, res) => {
-    res.send("API Working");
+    res.send("API Working ✅");
 });
 
-app.listen(port, () => console.log(`✅ Server started on http://localhost:${port}`));
+// Start server
+app.listen(port, () => 
+    console.log(`✅ Server started on http://localhost:${port}`)
+);
