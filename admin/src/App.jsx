@@ -8,6 +8,8 @@ import Users from "./pages/Users";
 import Pyq from "./pages/Pyq";
 import Login from "./components/Login";
 import Dashboard from "./pages/Dashboard";
+import Community from "./pages/Community";
+import DbStatsCard from "./pages/DbStatsCard";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -81,6 +83,8 @@ const App = () => {
                   <Route path="/notes" element={<Notes token={token} />} />
                   <Route path="/users" element={<Users token={token} />} />
                   <Route path="/pyq" element={<Pyq token={token} />} />
+                  <Route path="/community" element={<Community token={token} />} />
+                  <Route path="/dbstats" element={<DbStatsCard token={token} />} />
                 </Routes>
               </div>
             </main>

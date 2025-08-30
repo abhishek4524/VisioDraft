@@ -77,6 +77,19 @@ const Sidebar = ({ setSidebarOpen }) => {
           <img src={assets.pyq} alt="" className='w-5 h-5'/>
           <span>List PYQ</span>
         </NavLink>
+
+        <NavLink 
+          to="/community" 
+          className={({ isActive }) => 
+            `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+              isActive ? 'bg-blue-100 text-blue-700 border-l-4 border-blue-500' : 'text-gray-700 hover:bg-gray-100'
+            }`
+          }
+          onClick={() => setSidebarOpen(false)}
+        >
+          <img src={assets.community} alt="" className='w-5 h-5'/>
+          <span>List Communities</span>
+        </NavLink>
       </div>
     </div>
   );

@@ -192,7 +192,6 @@ const UploadNotes = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-indigo-50 py-10">
-      <ToastContainer position="top-right" autoClose={5000} />
       <Navbar />
 
       <main className="flex-grow container mx-auto px-4 py-12 max-w-4xl">

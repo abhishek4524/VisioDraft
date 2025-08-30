@@ -13,12 +13,19 @@ import UserProfile from './pages/UserProfile';
 import Chat from './pages/Chat';
 import Community from './pages/Community';
 import CreateCommunity from './pages/CreateCommunity';
+import CommunityChat from './pages/CommunityChat';
+
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL
 
 function App() {
   return (
     <div>
+
+            <ToastContainer position="top-right" autoClose={5000} />
+      
       <Routes>
         <Route path='/' element={<Home/>} />
         <Route path='/login' element={<Login/>} />
@@ -32,6 +39,7 @@ function App() {
         <Route path='/chat' element={<Chat />} />
         <Route path='/community' element={<Community />} />
         <Route path='/community/create' element={<CreateCommunity />} />
+        <Route path='/community/:id/chat' element={<CommunityChat />} />
       </Routes>
     </div>
   )

@@ -4,7 +4,6 @@ import {
   FiType,
   FiFileText,
   FiTag,
-  FiCheck,
   FiX,
   FiPlus,
   FiAward,
@@ -28,7 +27,6 @@ const CreateCommunity = ({ onCommunityCreated, onCancel }) => {
     name: 0,
     description: 0,
   });
-  const [activeSection, setActiveSection] = useState("basic");
 
   // Available community topics
   const communityTopics = [
@@ -133,6 +131,11 @@ const CreateCommunity = ({ onCommunityCreated, onCancel }) => {
     setIsSubmitting(true);
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Please log in to create a community");
+        return;
+      }
+
       const response = await axios.post(
         `${backendUrl}/api/community/create`,
         formData,
@@ -179,6 +182,29 @@ const CreateCommunity = ({ onCommunityCreated, onCancel }) => {
     setFormData((prev) => ({ ...prev, icon }));
   };
 
+  // Check if user is authenticated
+  const token = localStorage.getItem("token");
+  if (!token) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            Authentication Required
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Please log in to create a community.
+          </p>
+          <button
+            onClick={() => (window.location.href = "/login")}
+            className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <Navbar />
@@ -206,75 +232,11 @@ const CreateCommunity = ({ onCommunityCreated, onCancel }) => {
                 <button
                   onClick={onCancel}
                   className="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all"
+                  aria-label="Close"
                 >
                   <FiX className="h-5 w-5" />
                 </button>
               )}
-            </div>
-          </div>
-
-          {/* Progress Steps */}
-          <div className="px-8 py-4 bg-white border-b border-gray-100">
-            <div className="flex items-center justify-center">
-              <button
-                onClick={() => setActiveSection("basic")}
-                className={`flex items-center px-4 py-2 rounded-full mr-2 transition-all ${
-                  activeSection === "basic"
-                    ? "bg-indigo-100 text-indigo-700 font-medium"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                <span
-                  className={`flex items-center justify-center h-6 w-6 rounded-full mr-2 ${
-                    activeSection === "basic"
-                      ? "bg-indigo-600 text-white"
-                      : "bg-gray-200"
-                  }`}
-                >
-                  1
-                </span>
-                Basic Info
-              </button>
-              <div className="h-0.5 w-8 bg-gray-200 mx-1"></div>
-              <button
-                onClick={() => setActiveSection("details")}
-                className={`flex items-center px-4 py-2 rounded-full mr-2 transition-all ${
-                  activeSection === "details"
-                    ? "bg-indigo-100 text-indigo-700 font-medium"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                <span
-                  className={`flex items-center justify-center h-6 w-6 rounded-full mr-2 ${
-                    activeSection === "details"
-                      ? "bg-indigo-600 text-white"
-                      : "bg-gray-200"
-                  }`}
-                >
-                  2
-                </span>
-                Details
-              </button>
-              <div className="h-0.5 w-8 bg-gray-200 mx-1"></div>
-              <button
-                onClick={() => setActiveSection("customize")}
-                className={`flex items-center px-4 py-2 rounded-full transition-all ${
-                  activeSection === "customize"
-                    ? "bg-indigo-100 text-indigo-700 font-medium"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                <span
-                  className={`flex items-center justify-center h-6 w-6 rounded-full mr-2 ${
-                    activeSection === "customize"
-                      ? "bg-indigo-600 text-white"
-                      : "bg-gray-200"
-                  }`}
-                >
-                  3
-                </span>
-                Customize
-              </button>
             </div>
           </div>
         </div>
@@ -283,11 +245,7 @@ const CreateCommunity = ({ onCommunityCreated, onCancel }) => {
         <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
           <form onSubmit={handleSubmit} className="p-8 space-y-6">
             {/* Community Name */}
-            <div
-              className={`transition-all duration-300 ${
-                activeSection !== "basic" ? "opacity-70" : "opacity-100"
-              }`}
-            >
+            <div>
               <label
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-700 mb-2 flex items-center"
@@ -318,25 +276,19 @@ const CreateCommunity = ({ onCommunityCreated, onCancel }) => {
                   </span>
                 </div>
               </div>
-              <div className="mt-1">
-                {errors.name ? (
-                  <p className="text-red-500 text-xs flex items-center">
-                    <FiX className="h-3 w-3 mr-1" /> {errors.name}
-                  </p>
-                ) : (
-                  <p className="text-gray-500 text-xs">
-                    Choose a clear, descriptive name for your community
-                  </p>
-                )}
-              </div>
+              {errors.name ? (
+                <p className="text-red-500 text-xs mt-1 flex items-center">
+                  <FiX className="h-3 w-3 mr-1" /> {errors.name}
+                </p>
+              ) : (
+                <p className="text-gray-500 text-xs mt-1">
+                  Choose a clear, descriptive name for your community
+                </p>
+              )}
             </div>
 
             {/* Description */}
-            <div
-              className={`transition-all duration-300 ${
-                activeSection !== "basic" ? "opacity-70" : "opacity-100"
-              }`}
-            >
+            <div>
               <label
                 htmlFor="description"
                 className="block text-sm font-medium text-gray-700 mb-2 flex items-center"
@@ -361,31 +313,25 @@ const CreateCommunity = ({ onCommunityCreated, onCancel }) => {
                   }`}
                   maxLength={500}
                 />
-                <div className="absolute bottom-2 right-2 pr-1 flex items-center">
+                <div className="absolute bottom-2 right-2 flex items-center">
                   <span className="text-gray-400 text-sm bg-white px-2 py-1 rounded">
                     {characterCount.description}/500
                   </span>
                 </div>
               </div>
-              <div className="mt-1">
-                {errors.description ? (
-                  <p className="text-red-500 text-xs flex items-center">
-                    <FiX className="h-3 w-3 mr-1" /> {errors.description}
-                  </p>
-                ) : (
-                  <p className="text-gray-500 text-xs">
-                    Help people understand what this community is about
-                  </p>
-                )}
-              </div>
+              {errors.description ? (
+                <p className="text-red-500 text-xs mt-1 flex items-center">
+                  <FiX className="h-3 w-3 mr-1" /> {errors.description}
+                </p>
+              ) : (
+                <p className="text-gray-500 text-xs mt-1">
+                  Help people understand what this community is about
+                </p>
+              )}
             </div>
 
             {/* Topic Selection */}
-            <div
-              className={`transition-all duration-300 ${
-                activeSection !== "details" ? "opacity-70" : "opacity-100"
-              }`}
-            >
+            <div>
               <label
                 htmlFor="topic"
                 className="block text-sm font-medium text-gray-700 mb-2 flex items-center"
@@ -439,11 +385,7 @@ const CreateCommunity = ({ onCommunityCreated, onCancel }) => {
             </div>
 
             {/* Icon Selection */}
-            <div
-              className={`transition-all duration-300 ${
-                activeSection !== "customize" ? "opacity-70" : "opacity-100"
-              }`}
-            >
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                 <span className="bg-indigo-100 text-indigo-700 p-1 rounded mr-2">
                   <FiAward className="h-4 w-4" />
@@ -461,14 +403,14 @@ const CreateCommunity = ({ onCommunityCreated, onCancel }) => {
                         ? "border-indigo-500 bg-indigo-50 shadow-md scale-105"
                         : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                     }`}
+                    aria-label={`Select ${icon} as community icon`}
                   >
                     {icon}
                   </button>
                 ))}
               </div>
               <p className="text-gray-500 text-xs mt-2">
-                Choose an icon that represents your community (currently
-                selected: {formData.icon})
+                Choose an icon that represents your community
               </p>
             </div>
 
@@ -484,83 +426,42 @@ const CreateCommunity = ({ onCommunityCreated, onCancel }) => {
                   Cancel
                 </button>
               )}
-              <div className="flex space-x-3">
-                {activeSection !== "basic" && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setActiveSection(
-                        activeSection === "details" ? "basic" : "details"
-                      )
-                    }
-                    className="px-4 py-3 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-all font-medium"
-                  >
-                    Back
-                  </button>
-                )}
-                {activeSection !== "customize" ? (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setActiveSection(
-                        activeSection === "basic" ? "details" : "customize"
-                      )
-                    }
-                    className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-700 text-white rounded-lg hover:from-indigo-600 hover:to-indigo-800 transition-all font-medium flex items-center justify-center"
-                  >
-                    Continue
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all disabled:opacity-50 font-medium flex items-center justify-center shadow-md hover:shadow-lg"
+              >
+                {isSubmitting ? (
+                  <>
                     <svg
-                      className="ml-2 h-4 w-4"
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                       xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
+                      fill="none"
+                      viewBox="0 0 24 24"
                     >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
                       <path
-                        fillRule="evenodd"
-                        d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
-                  </button>
+                    Creating...
+                  </>
                 ) : (
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all disabled:opacity-50 font-medium flex items-center justify-center shadow-md hover:shadow-lg"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Creating...
-                      </>
-                    ) : (
-                      <>
-                        <FiPlus className="mr-2" />
-                        Create Community
-                      </>
-                    )}
-                  </button>
+                  <>
+                    <FiPlus className="mr-2" />
+                    Create Community
+                  </>
                 )}
-              </div>
+              </button>
             </div>
           </form>
         </div>

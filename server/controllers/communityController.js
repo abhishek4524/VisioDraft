@@ -230,40 +230,25 @@ export const unsubscribeFromCommunity = async (req, res) => {
 // View single community (with members and additional details)
 export const viewCommunity = async (req, res) => {
   try {
-    const { communityId } = req.query;
+    const { id } = req.params; // use params not query
 
-    if (!communityId) {
-      return res.status(400).json({
-        success: false,
-        message: "Community ID is required",
-      });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid community ID" });
     }
 
-    if (!mongoose.Types.ObjectId.isValid(communityId)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid community ID",
-      });
-    }
-
-    const community = await Community.findById(communityId)
+    const community = await Community.findById(id)
       .populate("uploadedBy", "name email profilePic")
       .populate("joinedUsers", "name email profilePic")
       .populate("moderators", "name email profilePic");
 
     if (!community) {
-      return res.status(404).json({
-        success: false,
-        message: "Community not found",
-      });
+      return res.status(404).json({ success: false, message: "Community not found" });
     }
 
-    // Check if current user is a member
     const isMember = community.joinedUsers.some(
       (user) => user._id.toString() === req.user._id.toString()
     );
 
-    // Check if current user is a moderator
     const isModerator = community.moderators.some(
       (user) => user._id.toString() === req.user._id.toString()
     );
@@ -274,18 +259,15 @@ export const viewCommunity = async (req, res) => {
       userStatus: {
         isMember,
         isModerator,
-        isCreator:
-          community.uploadedBy._id.toString() === req.user._id.toString(),
+        isCreator: community.uploadedBy._id.toString() === req.user._id.toString(),
       },
     });
   } catch (error) {
     console.error("View community error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message || "Internal server error",
-    });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
 
 // List all communities (with filtering, pagination, and sorting)
 export const listCommunities = async (req, res) => {
@@ -391,43 +373,71 @@ export const listJoinedCommunities = async (req, res) => {
 // Get community statistics
 export const getCommunityStats = async (req, res) => {
   try {
-    const { communityId } = req.query;
+    const { id } = req.params;
 
-    if (!communityId) {
-      return res.status(400).json({
-        success: false,
-        message: "Community ID is required",
-      });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid community ID" });
     }
 
-    const community = await Community.findById(communityId);
+    const community = await Community.findById(id);
     if (!community) {
-      return res.status(404).json({
-        success: false,
-        message: "Community not found",
-      });
+      return res.status(404).json({ success: false, message: "Community not found" });
     }
-
-    // Get member growth data (last 30 days)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    // This would require adding a timestamps to joinedUsers array
-    // For now, we'll return basic stats
 
     res.json({
       success: true,
       stats: {
         totalMembers: community.joinedUsers.length,
         createdAt: community.createdAt,
-        // Add more stats as needed
       },
     });
   } catch (error) {
     console.error("Get community stats error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message || "Internal server error",
-    });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
+// Approve community
+export const approveCommunity = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const community = await Community.findByIdAndUpdate(
+      id,
+      { status: "approved" },
+      { new: true }
+    );
+    if (!community) return res.status(404).json({ success: false, message: "Community not found" });
+    res.json({ success: true, community });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error approving community" });
+  }
+};
+
+// Reject community
+export const rejectCommunity = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const community = await Community.findByIdAndUpdate(
+      id,
+      { status: "rejected" },
+      { new: true }
+    );
+    if (!community) return res.status(404).json({ success: false, message: "Community not found" });
+    res.json({ success: true, community });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error rejecting community" });
+  }
+};
+
+// Delete community
+export const deleteCommunity = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const community = await Community.findByIdAndDelete(id);
+    if (!community) return res.status(404).json({ success: false, message: "Community not found" });
+    res.json({ success: true, message: "Community deleted" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error deleting community" });
+  }
+};
+

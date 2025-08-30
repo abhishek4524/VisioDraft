@@ -3,6 +3,7 @@ import axios from "axios";
 import { backendUrl } from "../App";
 import { useNavigate } from "react-router-dom";
 import { Camera, Edit2, Key, LogOut } from "lucide-react";
+import Navbar from "../components/Navbar";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -99,7 +100,8 @@ const UserProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen bg-gray-50 py-20">
+      <Navbar />
       <div className="max-w-3xl mx-auto">
         {/* Profile Header */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
