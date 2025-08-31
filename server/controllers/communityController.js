@@ -429,15 +429,125 @@ export const rejectCommunity = async (req, res) => {
   }
 };
 
-// Delete community
-export const deleteCommunity = async (req, res) => {
+
+
+export const checkMembership = async (req, res) => {
   try {
-    const { id } = req.body;
-    const community = await Community.findByIdAndDelete(id);
-    if (!community) return res.status(404).json({ success: false, message: "Community not found" });
-    res.json({ success: true, message: "Community deleted" });
+    const { id } = req.params;
+    
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid community ID" });
+    }
+    
+    const community = await Community.findById(id);
+    if (!community) {
+      return res.status(404).json({ success: false, message: "Community not found" });
+    }
+    
+    const isMember = community.joinedUsers.some(
+      userId => userId.toString() === req.user._id.toString()
+    );
+    
+    res.json({ success: true, isMember });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Error deleting community" });
+    console.error("Check membership error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
+// Update community
+export const updateCommunity = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, topic, icon } = req.body;
+    
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid community ID" });
+    }
+    
+    const community = await Community.findById(id);
+    if (!community) {
+      return res.status(404).json({ success: false, message: "Community not found" });
+    }
+    
+    // Check if user is the creator
+    if (community.uploadedBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: "Only the creator can edit this community" });
+    }
+    
+    // Validate input
+    if (name && (name.length < 3 || name.length > 50)) {
+      return res.status(400).json({
+        success: false,
+        message: "Community name must be between 3 and 50 characters",
+      });
+    }
+    
+    if (description && (description.length < 10 || description.length > 500)) {
+      return res.status(400).json({
+        success: false,
+        message: "Description must be between 10 and 500 characters",
+      });
+    }
+    
+    // Update community
+    const updatedCommunity = await Community.findByIdAndUpdate(
+      id,
+      { 
+        ...(name && { name: name.trim() }),
+        ...(description && { description: description.trim() }),
+        ...(topic && { topic }),
+        ...(icon && { icon })
+      },
+      { new: true, runValidators: true }
+    ).populate("uploadedBy", "name email profilePic")
+     .populate("joinedUsers", "name email profilePic");
+    
+    res.json({
+      success: true,
+      message: "Community updated successfully",
+      community: updatedCommunity
+    });
+  } catch (error) {
+    console.error("Update community error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// Delete community
+export const deleteCommunity = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid community ID" });
+    }
+    
+    const community = await Community.findById(id);
+    if (!community) {
+      return res.status(404).json({ success: false, message: "Community not found" });
+    }
+    
+    // Check if user is the creator
+    if (community.uploadedBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: "Only the creator can delete this community" });
+    }
+    
+    // Remove community from all users' joinedCommunities
+    await User.updateMany(
+      { joinedCommunities: id },
+      { $pull: { joinedCommunities: id } }
+    );
+    
+    // Delete the community
+    await Community.findByIdAndDelete(id);
+    
+    res.json({
+      success: true,
+      message: "Community deleted successfully"
+    });
+  } catch (error) {
+    console.error("Delete community error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};

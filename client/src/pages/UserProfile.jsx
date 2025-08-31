@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { backendUrl } from "../App";
 import { useNavigate } from "react-router-dom";
-import { Camera, Edit2, Key, LogOut } from "lucide-react";
+import { Edit2, Key, LogOut } from "lucide-react";
 import Navbar from "../components/Navbar";
 
 const UserProfile = () => {
@@ -128,12 +128,6 @@ const UserProfile = () => {
                     </div>
                   )}
                 </div>
-                <button 
-                  className="absolute bottom-2 right-2 bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition shadow-md"
-                  onClick={() => navigate("/edit-profile")}
-                >
-                  <Camera size={16} />
-                </button>
               </div>
               
               {/* User Info */}
@@ -235,20 +229,20 @@ const UserProfile = () => {
         <div className="bg-white p-6 rounded-xl shadow-md">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Account Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button
-              onClick={() => navigate("/edit-profile")}
-              className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
-            >
-              <Edit2 size={18} className="text-blue-500 mr-2" />
-              <span>Edit Profile</span>
-            </button>
-            <button
-              onClick={() => navigate("/change-password")}
-              className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
-            >
-              <Key size={18} className="text-green-500 mr-2" />
-              <span>Change Password</span>
-            </button>
+<button
+  onClick={() => navigate("/setup-profile")}  // Changed from "/edit-profile"
+  className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+>
+  <Edit2 size={18} className="text-blue-500 mr-2" />
+  <span>Edit Profile</span>
+</button>
+<button
+  onClick={() => navigate("/change-password")}
+  className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+>
+  <Key size={18} className="text-green-500 mr-2" />
+  <span>Change Password</span>
+</button>
             <button
               onClick={handleLogout}
               className="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"

@@ -14,6 +14,7 @@ import Chat from './pages/Chat';
 import Community from './pages/Community';
 import CreateCommunity from './pages/CreateCommunity';
 import CommunityChat from './pages/CommunityChat';
+import ChangePassword from './pages/ChangePassword';
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -30,16 +31,17 @@ function App() {
         <Route path='/' element={<Home/>} />
         <Route path='/login' element={<Login/>} />
         <Route path='/signup' element={<Signup/>} />
-        <Route path='/setup-profile' element={<SetupProfile/>} />
         <Route path='/pyqs' element={<Pyqs/>} />
         <Route path='/notes' element={<Notes/>} />
         <Route path='/upload-notes' element={<UploadNotes/>} />
         <Route path='/ask-ai' element={<AskAi/>} />
         <Route path='/profile' element={<UserProfile />} />
+         <Route path="/setup-profile" element={<SetupProfile />} />
         <Route path='/chat' element={<Chat />} />
         <Route path='/community' element={<Community />} />
         <Route path='/community/create' element={<CreateCommunity />} />
         <Route path='/community/:id/chat' element={<CommunityChat />} />
+        <Route path="/change-password" element={<ChangePassword />} />
       </Routes>
     </div>
   )

@@ -1,3 +1,4 @@
+// controllers/userController.js
 import validator from "validator";
 import userModel from "../models/userModel.js";
 import Admin from "../models/adminLogModel.js";
@@ -28,7 +29,22 @@ const loginUser = async (req, res) => {
     }
 
     const token = createToken(user._id);
-    res.json({ success: true, token, user: { id: user._id, name: user.name, email: user.email } });
+    res.json({ 
+      success: true, 
+      token, 
+      user: { 
+        id: user._id, 
+        name: user.name, 
+        email: user.email,
+        profilePicture: user.profilePicture,
+        username: user.username,
+        university: user.university,
+        department: user.department,
+        registrationNumber: user.registrationNumber,
+        year: user.year,
+        phone: user.phone
+      } 
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: error.message });
@@ -74,7 +90,15 @@ const registerUser = async (req, res) => {
     const user = await newUser.save();
     const token = createToken(user._id);
 
-    res.json({ success: true, token, user: { id: user._id, name: user.name, email: user.email } });
+    res.json({ 
+      success: true, 
+      token, 
+      user: { 
+        id: user._id, 
+        name: user.name, 
+        email: user.email 
+      } 
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: error.message });
@@ -84,16 +108,46 @@ const registerUser = async (req, res) => {
 // ✅ Setup / Update Profile
 const setupProfile = async (req, res) => {
   try {
-    const { name, university, bio, profilePic } = req.body;
+    const { 
+      username, 
+      name, 
+      email, 
+      phone, 
+      university, 
+      department, 
+      registrationNumber, 
+      year, 
+      profilePicture 
+    } = req.body;
+
+    // Check if username is already taken by another user
+    if (username) {
+      const existingUser = await userModel.findOne({ 
+        username, 
+        _id: { $ne: req.user._id } 
+      });
+      
+      if (existingUser) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Username is already taken" 
+        });
+      }
+    }
 
     const updatedUser = await userModel.findByIdAndUpdate(
       req.user._id,
       {
         $set: {
+          ...(username && { username }),
           ...(name && { name }),
+          ...(email && { email }),
+          ...(phone && { phone }),
           ...(university && { university }),
-          ...(bio && { bio }),
-          ...(profilePic && { profilePic }),
+          ...(department && { department }),
+          ...(registrationNumber && { registrationNumber }),
+          ...(year && { year }),
+          ...(profilePicture && { profilePicture }),
         },
       },
       { new: true, runValidators: true, select: "-password" }
@@ -103,10 +157,102 @@ const setupProfile = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    res.json({ success: true, message: "Profile updated successfully", user: updatedUser });
+    res.json({ 
+      success: true, 
+      message: "Profile updated successfully", 
+      user: updatedUser 
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ✅ Get user profile
+const getUser = async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user._id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to fetch user", error: error.message });
+  }
+};
+
+// ✅ Update user profile (for editing)
+const updateUser = async (req, res) => {
+  try {
+    const { 
+      username, 
+      name, 
+      email, 
+      phone, 
+      university, 
+      department, 
+      registrationNumber, 
+      year, 
+      profilePicture 
+    } = req.body;
+
+    // Check if username is already taken by another user
+    if (username) {
+      const existingUser = await userModel.findOne({ 
+        username, 
+        _id: { $ne: req.user._id } 
+      });
+      
+      if (existingUser) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Username is already taken" 
+        });
+      }
+    }
+
+    // Check if email is already taken by another user
+    if (email) {
+      const existingUser = await userModel.findOne({ 
+        email, 
+        _id: { $ne: req.user._id } 
+      });
+      
+      if (existingUser) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Email is already taken" 
+        });
+      }
+    }
+
+    const updateData = {};
+    
+    if (username) updateData.username = username;
+    if (name) updateData.name = name;
+    if (email) updateData.email = email;
+    if (phone) updateData.phone = phone;
+    if (university) updateData.university = university;
+    if (department) updateData.department = department;
+    if (registrationNumber) updateData.registrationNumber = registrationNumber;
+    if (year) updateData.year = year;
+    if (profilePicture) updateData.profilePicture = profilePicture;
+
+    const updatedUser = await userModel.findByIdAndUpdate(
+      req.user._id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, user: updatedUser });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to update user", error: error.message });
   }
 };
 
@@ -139,62 +285,15 @@ const adminLogin = async (req, res) => {
   }
 };
 
-
 // ✅ List all users
 const listUsers = async (req, res) => {
   try {
-    const users = await userModel.find({}).select("name email role createdAt");
+    const users = await userModel.find({}).select("-password");
     res.json({ success: true, users });
   } catch (error) {
     res
       .status(500)
       .json({ success: false, message: "Failed to fetch users", error: error.message });
-  }
-};
-
-// ✅ Get a single user
-const getUser = async (req, res) => {
-  try {
-    const user = await userModel.findById(req.user._id).select("-password");
-
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
-
-    res.json({ success: true, user });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to fetch user", error: error.message });
-  }
-};
-
-// ✅ Update user
-const updateUser = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const updateData = req.body;
-
-    if (!userId) {
-      return res.status(400).json({ success: false, message: "User ID is required" });
-    }
-
-    // Prevent updating sensitive fields
-    if (updateData.password || updateData.role) {
-      return res.status(403).json({ success: false, message: "Unauthorized to update this field" });
-    }
-
-    const updatedUser = await userModel.findByIdAndUpdate(
-      userId,
-      updateData,
-      { new: true, runValidators: true }
-    ).select("-password");
-
-    if (!updatedUser) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
-
-    res.json({ success: true, user: updatedUser });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to update user", error: error.message });
   }
 };
 
@@ -219,5 +318,50 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// ✅ Change Password
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user._id;
 
-export { loginUser, registerUser, setupProfile, adminLogin, listUsers, getUser , updateUser, deleteUser};
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({ success: false, message: "New password must be at least 8 characters" });
+    }
+
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: "Current password is incorrect" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ success: true, message: "Password updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Failed to change password", error: error.message });
+  }
+};
+
+
+export { 
+  loginUser, 
+  registerUser, 
+  setupProfile, 
+  adminLogin, 
+  listUsers, 
+  getUser, 
+  updateUser, 
+  deleteUser ,
+  changePassword
+};

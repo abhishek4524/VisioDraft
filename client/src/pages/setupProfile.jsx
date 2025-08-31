@@ -1,101 +1,140 @@
-import React, { useState } from 'react';
-import { FiUser, FiCheck, FiArrowRight } from 'react-icons/fi';
+import React, { useState, useEffect } from 'react';
+import { FiUser, FiCheck, FiArrowRight, FiCamera, FiX } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
+import axios from 'axios';
+import { backendUrl } from '../App';
 
 const SetupProfile = () => {
   const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [university, setUniversity] = useState('');
+  const [department, setDepartment] = useState('');
+  const [registrationNumber, setRegistrationNumber] = useState('');
+  const [year, setYear] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const avatarOptions = [
-    assets.a,
-    assets.b,
-    assets.c,
-    assets.d,
-    assets.e,
-    assets.f,
-    assets.g,
-    assets.h,
-    assets.i,
-    assets.j,
-    assets.k,
-    assets.l,
-    assets.m,
+    assets.a, assets.b, assets.c, assets.d, assets.e, assets.f,
+    assets.g, assets.h, assets.i, assets.j, assets.k, assets.l, assets.m
   ];
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const res = await axios.get(`${backendUrl}/api/user/user-profile`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        const userData = res.data.user;
+        setUser(userData);
+        setUsername(userData.username || '');
+        setName(userData.name || '');
+        setEmail(userData.email || '');
+        setPhone(userData.phone || '');
+        setUniversity(userData.university || '');
+        setDepartment(userData.department || '');
+        setRegistrationNumber(userData.registrationNumber || '');
+        setYear(userData.year || '');
+        
+        // Set the current avatar if it exists in the options
+        if (userData.profilePicture) {
+          const avatarIndex = avatarOptions.findIndex(avatar => 
+            avatar === userData.profilePicture
+          );
+          if (avatarIndex !== -1) {
+            setSelectedAvatar(avatarIndex);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch user profile:", err);
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [navigate]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Profile setup complete:', { username, avatar: selectedAvatar });
+    
+    try {
+      const token = localStorage.getItem("token");
+      const profilePicture = selectedAvatar !== null ? avatarOptions[selectedAvatar] : null;
+      
+      const updateData = {
+        username,
+        name,
+        email,
+        phone,
+        university,
+        department,
+        registrationNumber,
+        year,
+        profilePicture
+      };
+
+      await axios.put(`${backendUrl}/api/user/update-profile`, updateData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      navigate('/profile'); // Redirect to profile page after update
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      alert("Failed to update profile. Please try again.");
+    } finally {
       setIsSubmitting(false);
-      navigate('/'); // Redirect to home after setup
-    }, 1500);
+    }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="text-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-12 w-12 mx-auto text-indigo-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Complete Your Profile
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Choose a username and avatar to personalize your account
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-2xl font-bold text-gray-800">Edit Profile</h1>
+            <button 
+              onClick={() => navigate('/profile')}
+              className="p-2 rounded-full hover:bg-gray-100"
+            >
+              <FiX size={24} />
+            </button>
+          </div>
 
-        <div className="mt-8 bg-white py-8 px-6 shadow-lg rounded-xl border border-gray-100 sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label
-                htmlFor="username"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Username
-              </label>
-              <div className="relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiUser className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 sm:text-sm"
-                  placeholder="cool_username123"
-                />
-              </div>
-              <p className="mt-1 text-xs text-gray-500">
-                This will be your unique identifier on the platform
-              </p>
-            </div>
-
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Avatar Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                Choose Your Avatar
+                Profile Picture
               </label>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
                 {avatarOptions.map((avatar, index) => (
                   <div
                     key={index}
@@ -113,7 +152,7 @@ const SetupProfile = () => {
                     />
                     {selectedAvatar === index && (
                       <div className="absolute inset-0 flex items-center justify-center bg-indigo-500 bg-opacity-30 rounded-full">
-                        <FiCheck className="h-6 w-6 text-white" />
+                        <FiCheck className="h-5 w-5 text-white" />
                       </div>
                     )}
                   </div>
@@ -121,41 +160,146 @@ const SetupProfile = () => {
               </div>
             </div>
 
-            <div>
+            {/* Personal Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                  Username
+                </label>
+                <input
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone Number
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+            </div>
+
+            {/* Academic Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="university" className="block text-sm font-medium text-gray-700 mb-1">
+                  University
+                </label>
+                <input
+                  id="university"
+                  type="text"
+                  value={university}
+                  onChange={(e) => setUniversity(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">
+                  Department
+                </label>
+                <input
+                  id="department"
+                  type="text"
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="registrationNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                  Registration Number
+                </label>
+                <input
+                  id="registrationNumber"
+                  type="text"
+                  value={registrationNumber}
+                  onChange={(e) => setRegistrationNumber(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="year" className="block text-sm font-medium text-gray-700 mb-1">
+                  Year of Study
+                </label>
+                <select
+                  id="year"
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="">Select Year</option>
+                  <option value="1st Year">1st Year</option>
+                  <option value="2nd Year">2nd Year</option>
+                  <option value="3rd Year">3rd Year</option>
+                  <option value="4th Year">4th Year</option>
+                  <option value="5th Year">5th Year</option>
+                  <option value="Postgraduate">Postgraduate</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 pt-4">
+              <button
+                type="button"
+                onClick={() => navigate('/profile')}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
               <button
                 type="submit"
-                disabled={!username || selectedAvatar === null || isSubmitting}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
+                disabled={isSubmitting}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 flex items-center"
               >
                 {isSubmitting ? (
-                  <span className="flex items-center">
-                    <svg
-                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     Saving...
-                  </span>
+                  </>
                 ) : (
-                  <span className="flex items-center">
-                    Complete Setup
-                    <FiArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </span>
+                  'Save Changes'
                 )}
               </button>
             </div>

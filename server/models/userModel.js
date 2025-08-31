@@ -1,3 +1,4 @@
+// models/userModel.js
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
@@ -29,28 +30,40 @@ const userSchema = new mongoose.Schema(
     university: {
       type: String,
       trim: true,
-      required: function () {
-        return this.isStudent;
-      },
     },
-    // New fields for profile setup
+    department: {
+      type: String,
+      trim: true,
+    },
+    registrationNumber: {
+      type: String,
+      trim: true,
+    },
+    year: {
+      type: String,
+      trim: true,
+    },
+    phone: {
+      type: String,
+      trim: true,
+    },
     username: {
       type: String,
       unique: true,
-      sparse: true, // Allows many nulls before setup
+      sparse: true,
       trim: true,
       minlength: [3, "Username must be at least 3 characters"],
       maxlength: [20, "Username cannot be longer than 20 characters"],
     },
-    avatar: {
-      type: String, // store URL or image path
+    profilePicture: {
+      type: String, // This will store the asset key or URL
       default: "",
       trim: true,
     },
   },
   {
-    timestamps: true, // adds createdAt & updatedAt
-    minimize: false, // keep empty objects instead of removing them
+    timestamps: true,
+    minimize: false,
   }
 );
 
