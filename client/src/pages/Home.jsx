@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar'
 import Hero from '../components/Hero'
 import Hero2 from '../components/Hero2'
@@ -17,6 +17,15 @@ const steps = [
 ]
 
 const Home = () => {
+    const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
   return (
     <div>
       <Navbar />
@@ -157,27 +166,69 @@ const Home = () => {
   </div>
 </section>
 
-<section className="w-full py-20 bg-gradient-to-br from-white via-slate-50 to-slate-100">
-  <div className="max-w-4xl mx-auto px-4 text-center">
-    <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
-      Start turning <span className="text-blue-600">ideas into structure</span>.<br />
-      <span className="font-normal text-gray-700">The visual way.</span>
-    </h1>
+    <section className="w-full h-[50vh] min-h-[400px] bg-gradient-to-br from-white via-slate-50 to-slate-100 flex items-center justify-center relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute top-0 left-0 w-full h-full">
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-100 rounded-full opacity-50 animate-float"></div>
+        <div className="absolute top-1/3 right-1/4 w-24 h-24 bg-purple-100 rounded-full opacity-40 animate-float-delayed"></div>
+        <div className="absolute bottom-1/4 left-1/3 w-28 h-28 bg-cyan-100 rounded-full opacity-40 animate-float"></div>
+      </div>
+      
+      <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+        <h1 className={`text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          Transform <span className="text-blue-600 relative inline-block">
+            ideas into structure
+            <svg className="absolute -bottom-1 left-0 w-full" viewBox="0 0 500 12">
+              <path d="M0,8 Q250,0 500,8" className="stroke-blue-500 fill-none stroke-[3]" strokeLinecap="round" />
+            </svg>
+          </span>
+        </h1>
+        
+        <p className={`text-lg text-gray-700 mb-8 transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          The visual way to plan, organize, and bring your concepts to life
+        </p>
 
-    <p className="text-lg text-gray-600 mb-10">
-      Plan, organize, and visualize your concepts effortlessly. Bring your thoughts to life with our intuitive platform.
-    </p>
-
-    <div className="flex justify-center">
-      <Link to="/community" className="flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-blue-700 hover:scale-105 transition-all shadow-md cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-        </svg>
-        Get Started Free
-      </Link>
-    </div>
-  </div>
-</section>
+        <div className={`flex flex-col sm:flex-row justify-center items-center gap-4 transition-all duration-700 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <Link 
+            to="/community" 
+            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg text-base font-medium hover:bg-blue-700 hover:scale-105 transition-all shadow-md cursor-pointer group"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+            Get Started Free
+          </Link>
+        </div>
+        
+        <div className={`mt-8 transition-all duration-700 delay-600 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="flex items-center justify-center text-sm text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            No credit card required • Free forever plan
+          </div>
+        </div>
+      </div>
+      
+      <style jsx>{`
+        @keyframes float {
+          0% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-10px) rotate(5deg); }
+          100% { transform: translateY(0px) rotate(0deg); }
+        }
+        @keyframes float-delayed {
+          0% { transform: translateY(-10px) rotate(5deg); }
+          50% { transform: translateY(0px) rotate(0deg); }
+          100% { transform: translateY(-10px) rotate(5deg); }
+        }
+        .animate-float {
+          animation: float 8s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+          animation: float-delayed 8s ease-in-out infinite;
+        }
+      `}</style>
+    </section>
 <Footer />
     </div>
   )

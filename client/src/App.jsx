@@ -15,6 +15,11 @@ import Community from './pages/Community';
 import CreateCommunity from './pages/CreateCommunity';
 import CommunityChat from './pages/CommunityChat';
 import ChangePassword from './pages/ChangePassword';
+import AboutDeveloper from "./pages/AboutDeveloper";
+import TermsOfUse from "./pages/TermsOfUse";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -42,7 +47,12 @@ function App() {
         <Route path='/community/create' element={<CreateCommunity />} />
         <Route path='/community/:id/chat' element={<CommunityChat />} />
         <Route path="/change-password" element={<ChangePassword />} />
-      </Routes>
+         <Route path="/about-developer" element={<AboutDeveloper />} />
+        <Route path="/terms" element={<TermsOfUse />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        </Routes>
     </div>
   )
 }

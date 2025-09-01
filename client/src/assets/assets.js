@@ -37,6 +37,9 @@ import avatar8 from './avatar8.jpg'
 import avatar9 from './avatar9.jpg'
 import avatar10 from './avatar10.jpg'
 
+
+import developer from './developer.png'
+
 export const assets = {
     logo,
     draft,
@@ -76,5 +79,7 @@ export const assets = {
   avatar7,
   avatar8,
   avatar9,
-  avatar10
+  avatar10,
+
+  developer
 }

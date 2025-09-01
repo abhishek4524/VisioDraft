@@ -20,41 +20,46 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Quick Links (Only working pages) */}
           <div>
             <h3 className="text-lg font-semibold text-white mb-4 pb-2 border-b border-blue-800 w-max">
               Quick Links
             </h3>
             <ul className="space-y-3">
-              {['Home', 'Features', 'Pricing', 'Blog'].map((item) => (
-                <li key={item}>
-                  <a 
-                    href={`/${item.toLowerCase()}`} 
+              {[
+                { name: "PYQs", path: "/pyqs" },
+                { name: "Notes", path: "/notes" },
+                { name: "Upload Notes", path: "/upload-notes" },
+                { name: "Ask AI", path: "/ask-ai" },
+                { name: "Community", path: "/community" },
+                { name: "About Developer", path: "/about-developer" },
+              ].map((item) => (
+                <li key={item.name}>
+                  <a
+                    href={item.path}
                     className="text-gray-300 hover:text-white transition-colors duration-300 flex items-center group"
                   >
                     <span className="w-1 h-1 bg-blue-400 rounded-full mr-2 group-hover:w-2 transition-all duration-300"></span>
-                    {item}
+                    {item.name}
                   </a>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Resources */}
+          {/* Resources (agar chhodo to remove kar do, warna Terms/Privacy rakho) */}
           <div>
             <h3 className="text-lg font-semibold text-white mb-4 pb-2 border-b border-blue-800 w-max">
               Resources
             </h3>
             <ul className="space-y-3">
               {[
-                { name: 'Help Center', path: '/help' },
-                { name: 'User Guides', path: '/guides' },
-                { name: 'Terms of Use', path: '/terms' },
-                { name: 'Privacy Policy', path: '/privacy' }
+                { name: "Terms of Use", path: "/terms" },
+                { name: "Privacy Policy", path: "/privacy" },
               ].map((item) => (
                 <li key={item.name}>
-                  <a 
-                    href={item.path} 
+                  <a
+                    href={item.path}
                     className="text-gray-300 hover:text-white transition-colors duration-300 flex items-center group"
                   >
                     <span className="w-1 h-1 bg-blue-400 rounded-full mr-2 group-hover:w-2 transition-all duration-300"></span>
@@ -73,15 +78,14 @@ const Footer = () => {
             <div className="flex space-x-4">
               {[
                 { icon: <Facebook size={20} />, url: "#" },
-                { icon: <Twitter size={20} />, url: "#" },
+                { icon: <Twitter size={20} />, url: "" },
                 { icon: <Linkedin size={20} />, url: "https://www.linkedin.com/in/abhishek-kumar-502b40324/" },
-                { icon: <Instagram size={20} />, url: "#" }
+                { icon: <Instagram size={20} />, url: "http://instagram.com/a_7ck_" },
               ].map((social, index) => (
                 <a
                   key={index}
                   href={social.url}
                   className="p-2 bg-blue-900 rounded-full hover:bg-blue-700 transition-all duration-300 hover:scale-110"
-                  aria-label={`${social.icon.type.displayName} icon`}
                 >
                   {social.icon}
                 </a>
@@ -89,38 +93,7 @@ const Footer = () => {
             </div>
             <div className="pt-2">
               <p className="text-gray-300 text-sm flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
-                support@visiodraft.com
-              </p>
-              <p className="text-gray-300 text-sm mt-2 flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                  />
-                </svg>
-                +1 (555) 123-4567
+                visiofraft@gmail.com
               </p>
             </div>
           </div>
@@ -134,7 +107,7 @@ const Footer = () => {
           <p className="mt-2 text-gray-500 text-xs">
             Built with <span className="text-red-400">❤️</span> by{" "}
             <a
-              href="https://github.com/745590"
+              href="/about-developer"
               className="text-blue-300 hover:text-blue-200 underline transition-colors duration-300"
             >
               Abhishek Kumar

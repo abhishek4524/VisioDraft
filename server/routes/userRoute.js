@@ -9,7 +9,10 @@ import {
   getUser, 
   updateUser, 
   deleteUser,
-  changePassword
+  changePassword,
+  forgotPassword,
+  resetPassword,
+  verifyResetToken
 } from "../controllers/userController.js";
 
 import userAuth from "../middleware/userAuth.js"
@@ -28,5 +31,8 @@ userRouter.post("/admin", adminLogin);
 userRouter.get("/db-stats", verifyAdmin, getDbStats);
 userRouter.delete("/delete-user/:userId", verifyAdmin, deleteUser);
 userRouter.post("/change-password", userAuth, changePassword);
+userRouter.post("/forgot-password", forgotPassword);
+userRouter.post("/reset-password", resetPassword);
+userRouter.post("/verify-reset-token", verifyResetToken);
 
 export default userRouter;

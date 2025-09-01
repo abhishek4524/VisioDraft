@@ -1,4 +1,3 @@
-// models/userModel.js
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
@@ -50,15 +49,22 @@ const userSchema = new mongoose.Schema(
     username: {
       type: String,
       unique: true,
-      sparse: true,
+      sparse: true, // unique ke sath allow null
       trim: true,
       minlength: [3, "Username must be at least 3 characters"],
       maxlength: [20, "Username cannot be longer than 20 characters"],
     },
     profilePicture: {
-      type: String, // This will store the asset key or URL
+      type: String, // asset key or URL
       default: "",
       trim: true,
+    },
+    // Reset password fields
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordExpires: {
+      type: Date,
     },
   },
   {
@@ -67,7 +73,7 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Prevent model overwrite on hot-reload in dev
+// Prevent model overwrite on hot reload
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 export default User;
