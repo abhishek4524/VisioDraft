@@ -9,6 +9,7 @@ import {
   FiUser,
   FiFilter,
   FiX,
+  FiTrash2,
 } from "react-icons/fi";
 import Footer from "../components/Footer";
 import axios from "axios";
@@ -21,6 +22,7 @@ const Notes = () => {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [user, setUser] = useState(null);
 
   const [filters, setFilters] = useState({
     course: null,
@@ -59,8 +61,28 @@ const Notes = () => {
     }
   };
 
+  const fetchUser = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const response = await axios.get(
+          `${backendUrl}/api/user/user-profile`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (response.data.success) {
+          setUser(response.data.user);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  };
+
   useEffect(() => {
     fetchNotes();
+    fetchUser();
   }, []); // Apply filters whenever filters or searchQuery changes
 
   useEffect(() => {
@@ -116,72 +138,80 @@ const Notes = () => {
 
   const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
+  const handleDeleteNote = async (noteId) => {
+    if (window.confirm("Are you sure you want to delete this note?")) {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.post(`${backendUrl}/api/note/remove/${noteId}`,
+          {id :noteId},
+          {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.data.success) {
+          toast.success("Note deleted successfully");
+          // Remove the note from the state
+          setAllNotes(allNotes.filter((note) => note._id !== noteId));
+          setNotes(notes.filter((note) => note._id !== noteId));
+        } else {
+          toast.error(response.data.message);
+        }
+      } catch (error) {
+        console.error("Error deleting note:", error);
+        toast.error(error.response?.data?.message || "Failed to delete note");
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-gray-50 to-gray-100">
-            <Navbar />     {" "}
+      <Navbar />
       <div className="pt-24 pb-8 w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-                {/* Hero Section */}       {" "}
+        {/* Hero Section */}
         <div className="mb-12 text-center">
-                   {" "}
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-                        Study Notes & Materials          {" "}
+            Study Notes & Materials
           </h1>
-                   {" "}
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                        Access comprehensive study materials shared by students
-            and faculty          {" "}
+            Access comprehensive study materials shared by students and faculty
           </p>
-                 {" "}
         </div>
-                {/* Search with animated background */}       {" "}
+
+        {/* Search with animated background */}
         <div className="relative mb-10">
-                   {" "}
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-lg transform -skew-y-1 -rotate-1"></div>
-                   {" "}
           <div className="relative bg-white rounded-xl shadow-xl p-1">
-                       {" "}
             <Search
               placeholder="Search notes by subject, topic or author..."
               onSearch={handleSearch}
             />
-                     {" "}
           </div>
-                 {" "}
         </div>
-                {/* Filter Sections */}       {" "}
+
+        {/* Filter Sections */}
         <div className="mt-8 bg-white rounded-2xl shadow-xl p-6 mb-8 border border-gray-100">
-                   {" "}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                       {" "}
             <div>
-                           {" "}
               <h2 className="text-xl font-bold text-gray-800 flex items-center">
-                               {" "}
-                <FiFilter className="h-6 w-6 mr-2 text-indigo-600" />           
-                    Filter Notes              {" "}
+                <FiFilter className="h-6 w-6 mr-2 text-indigo-600" />
+                Filter Notes
               </h2>
-                           {" "}
               <p className="text-sm text-gray-500 mt-1">
-                                Narrow down by course, branch, semester or type
-                             {" "}
+                Narrow down by course, branch, semester or type
               </p>
-                         {" "}
             </div>
-                       {" "}
             {activeFilterCount > 0 && (
               <button
                 onClick={clearFilters}
                 className="flex items-center text-sm font-medium text-white bg-gradient-to-r from-red-500 to-pink-600 px-4 py-2 rounded-lg shadow hover:shadow-md transition-all"
               >
-                                <FiX className="h-4 w-4 mr-1" />               
-                Clear all ({activeFilterCount})              {" "}
+                <FiX className="h-4 w-4 mr-1" />
+                Clear all ({activeFilterCount})
               </button>
             )}
-                     {" "}
           </div>
-                   {" "}
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                       {" "}
             <FilterSection
               title="Course"
               items={courses}
@@ -195,15 +225,12 @@ const Notes = () => {
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                                    <path d="M12 14l9-5-9-5-9 5 9 5z" />       
-                           {" "}
+                  <path d="M12 14l9-5-9-5-9 5 9 5z" />
                   <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                                 {" "}
                 </svg>
               }
               color="blue"
             />
-                       {" "}
             <FilterSection
               title="Branch"
               items={branches}
@@ -217,19 +244,16 @@ const Notes = () => {
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                                   {" "}
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
                     d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"
                   />
-                                 {" "}
                 </svg>
               }
               color="green"
             />
-                       {" "}
             <FilterSection
               title="Semester"
               items={semesters}
@@ -243,19 +267,16 @@ const Notes = () => {
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                                   {" "}
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
                     d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                   />
-                                 {" "}
                 </svg>
               }
               color="purple"
             />
-                       {" "}
             <FilterSection
               title="Note Type"
               items={noteTypes}
@@ -269,62 +290,46 @@ const Notes = () => {
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                                   {" "}
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
-                                 {" "}
                 </svg>
               }
               color="amber"
             />
-                     {" "}
           </div>
-                 {" "}
         </div>
-                {/* Results Section */}       {" "}
+
+        {/* Results Section */}
         <div className="mt-6">
-                   {" "}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                       {" "}
             <div>
-                           {" "}
               <h2 className="text-2xl font-bold text-gray-900">
-                               {" "}
                 {loading
                   ? "Loading..."
                   : `${notes.length} ${
                       notes.length === 1 ? "Note" : "Notes"
                     } Found`}
-                               {" "}
                 {activeFilterCount > 0 && !loading && (
                   <span className="text-sm font-normal text-gray-500 ml-2">
-                                        (filtered)                  {" "}
+                    (filtered)
                   </span>
                 )}
-                             {" "}
               </h2>
-                           {" "}
               {!loading && (
                 <p className="text-sm text-gray-500 mt-1">
-                                   {" "}
                   {notes.length > 0
                     ? "Browse and download the notes you need"
                     : "No notes match your current filters"}
-                                 {" "}
                 </p>
               )}
-                         {" "}
             </div>
-                       {" "}
             {!loading && notes.length > 0 && (
               <div className="flex items-center space-x-3">
-                               {" "}
-                <span className="text-sm text-gray-500">Sort by:</span>         
-                     {" "}
+                <span className="text-sm text-gray-500">Sort by:</span>
                 <select
                   className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
                   onChange={(e) => {
@@ -345,57 +350,48 @@ const Notes = () => {
                     setNotes(sorted);
                   }}
                 >
-                                    <option value="recent">Most Recent</option> 
-                                 {" "}
-                  <option value="downloads">Most Downloads</option>             
-                      <option value="rating">Highest Rating</option>           
-                        <option value="title">Alphabetical</option>             
-                   {" "}
+                  <option value="recent">Most Recent</option>
+                  <option value="downloads">Most Downloads</option>
+                  <option value="rating">Highest Rating</option>
+                  <option value="title">Alphabetical</option>
                 </select>
-                             {" "}
               </div>
             )}
-                     {" "}
           </div>
-                   {" "}
+
           {loading ? (
             <div className="flex justify-center py-12">
-                            <LoadingSpinner />           {" "}
+              <LoadingSpinner />
             </div>
           ) : notes.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                           {" "}
               {notes.map((note) => (
-                <NoteCard key={note._id} data={note} />
+                <NoteCard
+                  key={note._id}
+                  data={note}
+                  user={user}
+                  onDelete={handleDeleteNote}
+                />
               ))}
-                         {" "}
             </div>
           ) : (
             <div className="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
-                           {" "}
               <div className="mx-auto h-24 w-24 flex items-center justify-center rounded-full bg-gradient-to-r from-pink-100 to-purple-100 mb-6">
-                                <FiBook className="h-12 w-12 text-pink-600" /> 
-                           {" "}
+                <FiBook className="h-12 w-12 text-pink-600" />
               </div>
-                           {" "}
               <h3 className="mt-4 text-xl font-bold text-gray-900">
-                                No Notes found              {" "}
+                No Notes found
               </h3>
-                           {" "}
               <p className="mt-2 text-gray-500 max-w-md mx-auto">
-                               {" "}
                 {activeFilterCount > 0 || searchQuery
                   ? "No notes match your current filters. Try adjusting your search or filters."
                   : "No notes available at the moment. Please check back later."}
-                             {" "}
               </p>
-                           {" "}
               {(activeFilterCount > 0 || searchQuery) && (
                 <button
                   onClick={clearFilters}
                   className="mt-6 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:shadow-md transition-all flex items-center mx-auto font-medium"
                 >
-                                   {" "}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5 mr-2"
@@ -403,26 +399,21 @@ const Notes = () => {
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                                       {" "}
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
                       d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                     />
-                                     {" "}
                   </svg>
-                                    Reset All Filters                {" "}
+                  Reset All Filters
                 </button>
               )}
-                         {" "}
             </div>
           )}
-                 {" "}
         </div>
-             {" "}
       </div>
-            <Footer />   {" "}
+      <Footer />
     </div>
   );
 };
@@ -460,15 +451,11 @@ const FilterSection = ({
 
   return (
     <div>
-           {" "}
       <div className="flex items-center mb-3">
-                <div className={`mr-2 ${colorClasses[color].icon}`}>{icon}</div>
-                <h3 className="text-md font-semibold text-gray-700">{title}</h3>
-             {" "}
+        <div className={`mr-2 ${colorClasses[color].icon}`}>{icon}</div>
+        <h3 className="text-md font-semibold text-gray-700">{title}</h3>
       </div>
-           {" "}
       <div className="flex flex-wrap gap-2">
-               {" "}
         {items.map((item, index) => (
           <button
             key={index}
@@ -479,7 +466,7 @@ const FilterSection = ({
                 : colorClasses[color].inactive
             }`}
           >
-                        {item}           {" "}
+            {item}
             {activeItem === item && (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -488,29 +475,25 @@ const FilterSection = ({
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                               {" "}
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
                   d="M5 13l4 4L19 7"
                 />
-                             {" "}
               </svg>
             )}
-                     {" "}
           </button>
         ))}
-             {" "}
       </div>
-         {" "}
     </div>
   );
 };
 
-const NoteCard = ({ data }) => {
+const NoteCard = ({ data, user, onDelete }) => {
   const [isViewing, setIsViewing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleView = async () => {
     try {
@@ -533,6 +516,16 @@ const NoteCard = ({ data }) => {
       setIsViewing(false);
     }
   };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    await onDelete(data._id);
+    setIsDeleting(false);
+  };
+
+  // Check if the current user is the uploader of this note
+  const isUploader =
+    user && data.uploadedBy && user._id === data.uploadedBy._id;
 
   // Determine color based on note type
   const getNoteColor = () => {
@@ -604,17 +597,21 @@ const NoteCard = ({ data }) => {
         {/* Author section */}
         {data.uploadedBy && (
           <div className="flex items-center mt-4 mb-4 p-2 bg-gray-50 rounded-lg transition-all duration-300 group-hover:bg-blue-50">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 mr-2 transition-all duration-300 group-hover:bg-blue-200 group-hover:text-blue-700">
-              <FiUser className="w-4 h-4" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 transition-all duration-300 group-hover:text-blue-600">
-                Uploaded by
-              </p>
-              <p className="text-sm font-medium text-gray-700 transition-all duration-300 group-hover:text-blue-800">
-                {data.uploadedBy.name || data.uploadedBy.email}
-              </p>
-            </div>
+            {data.uploadedBy.profilePicture ? (
+              <img
+                src={data.uploadedBy.profilePicture}
+                alt={data.uploadedBy.name || "User"}
+                className="w-8 h-8 rounded-full object-cover mr-2"
+                onError={(e) => (e.currentTarget.style.display = "none")} // agar image broken ho to hide ho
+              />
+            ) : (
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 mr-2 transition-all duration-300 group-hover:bg-blue-200 group-hover:text-blue-700">
+                <FiUser className="w-4 h-4" />
+              </div>
+            )}
+            <span className="text-sm font-medium text-gray-700">
+              {data.uploadedBy.name || "Unknown"}
+            </span>
           </div>
         )}
 
@@ -658,21 +655,18 @@ const NoteCard = ({ data }) => {
             </span>
           </div>
 
-          <button
-            onClick={handleView}
-            disabled={isViewing}
-            className={`relative inline-flex items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-gradient-to-r ${noteColor} hover:shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50 disabled:opacity-50 overflow-hidden`}
-          >
-            {/* Animated ring on hover */}
-            {isHovered && !isViewing && (
-              <span className="absolute inset-0 rounded-full bg-white opacity-0 animate-ping-slow"></span>
-            )}
-
-            <span className="relative flex items-center">
-              {isViewing ? (
-                <>
+          <div className="flex items-center gap-2">
+            {/* Delete button for uploader */}
+            {isUploader && (
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="inline-flex items-center p-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-gradient-to-r from-red-500 to-red-600 hover:shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                title="Delete Note"
+              >
+                {isDeleting ? (
                   <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    className="animate-spin h-4 w-4 text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -691,16 +685,56 @@ const NoteCard = ({ data }) => {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Opening...
-                </>
-              ) : (
-                <>
-                  View Note
-                  <FiBook className="h-4 w-4 ml-2" />
-                </>
+                ) : (
+                  <FiTrash2 className="h-4 w-4" />
+                )}
+              </button>
+            )}
+
+            <button
+              onClick={handleView}
+              disabled={isViewing}
+              className={`relative inline-flex items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-gradient-to-r ${noteColor} hover:shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50 disabled:opacity-50 overflow-hidden`}
+            >
+              {/* Animated ring on hover */}
+              {isHovered && !isViewing && (
+                <span className="absolute inset-0 rounded-full bg-white opacity-0 animate-ping-slow"></span>
               )}
-            </span>
-          </button>
+
+              <span className="relative flex items-center">
+                {isViewing ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Opening...
+                  </>
+                ) : (
+                  <>
+                    View Note
+                    <FiBook className="h-4 w-4 ml-2" />
+                  </>
+                )}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

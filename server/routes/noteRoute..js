@@ -18,7 +18,7 @@ noteRouter.post(
   upload.single("file"),
   addNote
 );
-noteRouter.post("/remove", userAuth, removeNote);
+noteRouter.post("/remove/:id", userAuth, removeNote);
 noteRouter.post("/single", singleNote);
 noteRouter.get("/list", listNotes);
 noteRouter.get("/:id/view", viewNote);

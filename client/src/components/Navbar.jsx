@@ -1,13 +1,53 @@
 import React, { useState, useEffect } from "react";
 import { assets } from "../assets/assets";
 import { Menu, X, UserRound } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation ,useNavigate } from "react-router-dom";
+
+import axios from "axios";
+import { backendUrl } from "../App";
 
 const Navbar = () => {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [token, setToken] = useState(localStorage.getItem("token") || "");
+
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const res = await axios.get(`${backendUrl}/api/user/user-profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setUser(res.data.user);
+      } catch (err) {
+        console.error("Failed to fetch user profile:", err);
+        setError(err.response?.data?.message || "Failed to load profile");
+
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [navigate]);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -39,7 +79,7 @@ const Navbar = () => {
           ? "bg-white/90 backdrop-blur-md shadow-sm"
           : "bg-transparent backdrop-blur-none"
       }`}
-      style={{ transform: 'translateY(0)' }}
+      style={{ transform: "translateY(0)" }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
@@ -55,13 +95,9 @@ const Navbar = () => {
                 <Menu className="h-6 w-6" />
               )}
             </button>
-            
+
             <Link to="/" className="ml-4">
-              <img
-                src={assets.logo}
-                alt="Logo"
-                className="h-8 w-auto"
-              />
+              <img src={assets.logo} alt="Logo" className="h-8 w-auto" />
             </Link>
           </div>
 
@@ -111,9 +147,17 @@ const Navbar = () => {
                 <div className="hover:scale-105 active:scale-95 transition-transform">
                   <Link
                     to="/profile"
-                    className="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 shadow-sm"
+                    className="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 shadow-sm overflow-hidden"
                   >
-                    <UserRound className="h-5 w-5 text-white" />
+                    {user?.profilePicture ? (
+                      <img
+                        src={user.profilePicture}
+                        alt="Profile"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <UserRound className="h-5 w-5 text-white" />
+                    )}
                   </Link>
                 </div>
               </>
@@ -127,7 +171,7 @@ const Navbar = () => {
                     Log in
                   </Link>
                 </div>
-                
+
                 <div className="hover:scale-105 active:scale-95 transition-transform">
                   <Link
                     to="/signup"
@@ -170,10 +214,10 @@ const Navbar = () => {
             return (
               <div
                 key={index}
-                style={{ 
+                style={{
                   transitionDelay: `${index * 50}ms`,
-                  transform: 'translateX(0)',
-                  opacity: 1
+                  transform: "translateX(0)",
+                  opacity: 1,
                 }}
               >
                 <Link

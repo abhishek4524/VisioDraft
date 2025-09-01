@@ -499,8 +499,8 @@ const handleDownload = async () => {
       <div className="p-5">
         <div className="flex justify-between items-start mb-3">
           <div>
-            <h3 className="font-bold text-lg text-gray-900 mb-1 group-hover:text-blue-600 transition">
-              {data.title}
+            <h3 className="font-bold text-lg text-gray-900 mb-1 group-hover:text-blue-600 transition uppercase">
+              {data.title.replace(/-/g, " ")}
             </h3>
             {data.subjectCode && (
               <span className="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded">
