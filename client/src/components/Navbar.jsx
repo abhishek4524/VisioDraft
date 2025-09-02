@@ -149,15 +149,7 @@ const Navbar = () => {
                     to="/profile"
                     className="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 shadow-sm overflow-hidden"
                   >
-                    {user?.profilePicture ? (
-                      <img
-                        src={user.profilePicture}
-                        alt="Profile"
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
                       <UserRound className="h-5 w-5 text-white" />
-                    )}
                   </Link>
                 </div>
               </>
