@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { assets } from "../assets/assets";
 import { Menu, X, UserRound } from "lucide-react";
-import { Link, useLocation ,useNavigate } from "react-router-dom";
-
+import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import { backendUrl } from "../App";
 
@@ -15,13 +14,16 @@ const Navbar = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         setLoading(true);
         const token = localStorage.getItem("token");
+
+        if (!token) {
+          return; // ❌ Ab yahan redirect nahi hoga
+        }
 
         const res = await axios.get(`${backendUrl}/api/user/user-profile`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -34,7 +36,6 @@ const Navbar = () => {
 
         if (err.response?.status === 401) {
           localStorage.removeItem("token");
-          navigate("/login");
         }
       } finally {
         setLoading(false);
@@ -42,7 +43,7 @@ const Navbar = () => {
     };
 
     fetchUserProfile();
-  }, [navigate]);
+  }, []);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -144,7 +145,7 @@ const Navbar = () => {
                     to="/profile"
                     className="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 shadow-sm overflow-hidden"
                   >
-                      <UserRound className="h-5 w-5 text-white" />
+                    <UserRound className="h-5 w-5 text-white" />
                   </Link>
                 </div>
               </>
