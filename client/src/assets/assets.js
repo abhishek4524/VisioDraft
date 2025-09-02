@@ -1,4 +1,5 @@
 import logo from "./Logo1.png"
+import hero from "./hero.png"
 import draft from "./draft.png"
 import arrows from "./arrows.png"
 import chatbot from "./chatbot.png"
@@ -42,6 +43,7 @@ import developer from './developer.png'
 
 export const assets = {
     logo,
+    hero,
     draft,
     arrows,
     chatbot,

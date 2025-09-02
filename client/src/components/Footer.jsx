@@ -77,8 +77,8 @@ const Footer = () => {
             </h3>
             <div className="flex space-x-4">
               {[
-                { icon: <Facebook size={20} />, url: "#" },
-                { icon: <Twitter size={20} />, url: "" },
+                { icon: <Facebook size={20} />, url: "https://www.facebook.com/profile.php?id=61555703581430" },
+                { icon: <Twitter size={20} />, url: "https://x.com/AKCNMOTIVETION" },
                 { icon: <Linkedin size={20} />, url: "https://www.linkedin.com/in/abhishek-kumar-502b40324/" },
                 { icon: <Instagram size={20} />, url: "http://instagram.com/a_7ck_" },
               ].map((social, index) => (

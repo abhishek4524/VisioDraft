@@ -1,6 +1,8 @@
 import React from 'react';
 import SplineScene from './SplineScene';
 import { History, Hourglass, ArrowRight, Sparkles, Users, Zap } from 'lucide-react';
+import { assets } from '../assets/assets';
+import { Link } from 'react-router-dom';
 
 const Hero2 = () => {
   return (
@@ -52,7 +54,7 @@ const Hero2 = () => {
             
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-3 sm:gap-4 animate-fade-in-up">
-              <button className="group relative bg-[#2C3E50] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-semibold 
+              <Link to="/upload-notes" className="group relative bg-[#2C3E50] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-semibold 
                 hover:bg-[#34495E] transform transition-all duration-300 
                 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-white/50
                 overflow-hidden hover:scale-105 active:scale-95 flex items-center gap-2">
@@ -60,9 +62,9 @@ const Hero2 = () => {
                   Start Now <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
                 <span className="absolute inset-0 bg-gradient-to-r from-[#FF7E5F] to-[#FEB47B] opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-overlay"></span>
-              </button>
-              
-              <button className="group relative bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-semibold 
+              </Link>
+
+              <Link to="/community" className="group relative bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-semibold 
                 hover:bg-white/30 transform transition-all duration-300 
                 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-white/50
                 overflow-hidden hover:scale-105 active:scale-95">
@@ -70,7 +72,7 @@ const Hero2 = () => {
                   <Users className="w-4 h-4" /> Explore Features
                 </span>
                 <span className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-all duration-300"></span>
-              </button>
+              </Link>
             </div>
           
           </div>
@@ -80,7 +82,7 @@ const Hero2 = () => {
         <div className="w-full lg:w-1/2 h-[45vh] xs:h-[320px] sm:h-[380px] md:h-[450px] lg:h-[520px] xl:h-[600px] relative order-1 lg:order-2 animate-float-soft">
           <div className="absolute -inset-2 sm:-inset-3 md:-inset-4 rounded-2xl sm:rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 shadow-xl"></div>
           <div className="relative w-full h-full flex items-center justify-center p-2 sm:p-3 md:p-4">
-            <SplineScene />
+            <img src={assets.hero} alt="Hero Illustration" className="w-full h-full object-contain" />
           </div>
         </div>
       </div>
