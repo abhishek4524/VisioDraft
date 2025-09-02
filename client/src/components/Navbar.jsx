@@ -23,11 +23,6 @@ const Navbar = () => {
         setLoading(true);
         const token = localStorage.getItem("token");
 
-        if (!token) {
-          navigate("/login");
-          return;
-        }
-
         const res = await axios.get(`${backendUrl}/api/user/user-profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
