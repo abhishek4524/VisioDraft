@@ -1,5 +1,5 @@
 import Pyq from "../models/pyqModel.js";
-import path from "path";
+import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 
 // Upload PYQ (Admin only)
@@ -22,6 +22,15 @@ export const uploadPyq = async (req, res, next) => {
         .json({ success: false, message: "No file uploaded" });
     }
 
+    // Upload file to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "pyqs",
+      resource_type: "auto",
+    });
+
+    // Optionally delete local file after upload
+    try { fs.unlinkSync(req.file.path); } catch (e) {}
+
     const newPyq = new Pyq({
       title,
       description,
@@ -30,7 +39,7 @@ export const uploadPyq = async (req, res, next) => {
       branch,
       year,
       subject,
-      file: req.file.path, // local file path
+      file: result.secure_url, // Cloudinary URL
       uploadedBy,
     });
 
@@ -83,22 +92,12 @@ export const downloadPyq = async (req, res, next) => {
       return res.status(404).json({ success: false, message: "PYQ not found" });
     }
 
-    const filePath = path.resolve(pyq.file);
-
-    if (!fs.existsSync(filePath)) {
-      return res
-        .status(404)
-        .json({ success: false, message: "File not found on server" });
-    }
-
     // ✅ Increase download count
     pyq.downloadCount += 1;
-    console.log(
-      `Download count for PYQ ${pyq._id} increased to ${pyq.downloadCount}`
-    );
     await pyq.save();
 
-    res.download(filePath, `${pyq.title}_${pyq.year}.pdf`);
+    // Send Cloudinary URL for download
+    res.json({ success: true, url: pyq.file });
   } catch (error) {
     next(error);
   }
