@@ -25,7 +25,7 @@ export const uploadPyq = async (req, res, next) => {
     // Upload file to Cloudinary
     const result = await cloudinary.uploader.upload(req.file.path, {
       folder: "pyqs",
-      resource_type: "auto",
+      resource_type: "raw", // PDF/doc ke liye raw use karo
     });
 
     // Optionally delete local file after upload
