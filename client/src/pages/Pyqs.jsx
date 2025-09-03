@@ -21,7 +21,7 @@ const Pyqs = () => {
   });
 
   const courses = ["BTECH", "MBA", "MCA", "MTECH"];
-  const branches = ["CS", "IT", "ME", "EC", "EE", "CE"];
+  const branches = ["CSE", "IT", "ME", "EC", "EE", "CE"];
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
   const years = Array.from(
     { length: 10 },
