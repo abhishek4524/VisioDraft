@@ -25,7 +25,11 @@ connectCloudinary();
 
 // Middlewares
 app.use(express.json());
-app.use(cors());
+// Enable CORS for frontend domain
+app.use(cors({
+  origin: 'https://visio-admin.vercel.app',
+  credentials: true
+}));
 app.use(express.urlencoded({ extended: true }));
 
 // API endpoints
