@@ -655,6 +655,7 @@ const branchData = {
   ],
 };
 
+
 const UploadNotes = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -666,7 +667,7 @@ const UploadNotes = () => {
     noteType: "lecture",
     file: null,
   });
-  const [subjects, setSubjects] = useState([]);
+  // Removed subjects state, subject is now a normal text input
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [preview, setPreview] = useState("");
   const [token, setToken] = useState("");
@@ -680,12 +681,7 @@ const UploadNotes = () => {
     }
   }, [navigate]);
 
-  useEffect(() => {
-    if (formData.course && formData.semester) {
-      setSubjects(subjectData[formData.course]?.[formData.semester] || []);
-      setFormData((prev) => ({ ...prev, subject: "" }));
-    }
-  }, [formData.course, formData.semester]);
+  // Removed subject selection logic
 
   const [branches, setBranches] = useState([]);
 

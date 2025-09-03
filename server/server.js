@@ -35,6 +35,15 @@ app.use(cors({
 }));
 app.use(express.urlencoded({ extended: true }));
 
+// Handle preflight OPTIONS requests for all routes
+app.options('*', cors({
+  origin: [
+    'https://visio-admin.vercel.app',
+    'https://visio-draft.vercel.app'
+  ],
+  credentials: true
+}));
+
 // API endpoints
 app.use('/api/user', userRouter);
 app.use('/api/note', noteRouter);
