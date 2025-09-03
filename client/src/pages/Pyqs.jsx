@@ -7,6 +7,7 @@ import Footer from "../components/Footer";
 import { backendUrl } from "../App";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { Link } from "react-router-dom";
+import ComingSoonBanner from "../components/ComingSoonBanner";
 
 const Pyqs = () => {
   const [allPyqs, setAllPyqs] = useState([]);
@@ -327,6 +328,7 @@ const Pyqs = () => {
             )}
           </div>
 
+          <ComingSoonBanner />
           {loading ? (
             <div className="flex justify-center py-12">
               <LoadingSpinner />
@@ -465,6 +467,8 @@ const FilterSection = ({
     </div>
   );
 };
+
+
 
 const PyqCard = ({ data }) => {
 const handleDownload = async () => {
