@@ -34,58 +34,63 @@ export const uploadPyq = async (req, res, next) => {
     const db = mongoose.connection.db;
     const bucket = new mongoose.mongo.GridFSBucket(db, { bucketName: "pyqs" });
     
-    const uploadStream = bucket.openUploadStream(req.file.originalname, {
-      contentType: req.file.mimetype
+    // Create a promise to handle the upload
+    const uploadPromise = new Promise((resolve, reject) => {
+      const uploadStream = bucket.openUploadStream(req.file.originalname, {
+        contentType: req.file.mimetype
+      });
+
+      uploadStream.on('error', (error) => {
+        try { fs.unlinkSync(req.file.path); } catch (e) {}
+        reject(error);
+      });
+
+      uploadStream.on('finish', (file) => {
+        try { fs.unlinkSync(req.file.path); } catch (e) {}
+        resolve(file);
+      });
+
+      // Pipe the file to GridFS
+      fs.createReadStream(req.file.path).pipe(uploadStream);
     });
 
-    const readStream = fs.createReadStream(req.file.path);
-    
-    readStream.pipe(uploadStream)
-      .on("error", (err) => {
-        try { fs.unlinkSync(req.file.path); } catch (e) {}
-        return next(err);
-      })
-      .on("finish", async (file) => {
-        try { 
-          fs.unlinkSync(req.file.path); 
-        } catch (e) {
-          console.error("Error deleting temp file:", e);
-        }
-        
-        try {
-          const newPyq = new Pyq({
-            title,
-            description: description || "",
-            course,
-            semester,
-            branch,
-            year,
-            subject,
-            file: file._id.toString(),
-            uploadedBy: uploadedBy || "admin",
-          });
-          
-          await newPyq.save();
-          
-          res.status(201).json({
-            success: true,
-            message: "PYQ uploaded successfully",
-            data: {
-              id: newPyq._id,
-              title: newPyq.title,
-              file: newPyq.file,
-            },
-          });
-        } catch (saveError) {
-          // If saving fails, delete the uploaded file from GridFS
-          bucket.delete(file._id, (deleteErr) => {
-            if (deleteErr) {
-              console.error("Error deleting file from GridFS:", deleteErr);
-            }
-          });
-          next(saveError);
-        }
+    try {
+      const file = await uploadPromise;
+      
+      const newPyq = new Pyq({
+        title,
+        description: description || "",
+        course,
+        semester,
+        branch,
+        year,
+        subject,
+        file: file._id.toString(), // GridFS file id
+        uploadedBy: uploadedBy || "admin",
       });
+      
+      await newPyq.save();
+      
+      res.status(201).json({
+        success: true,
+        message: "PYQ uploaded successfully",
+        data: {
+          id: newPyq._id,
+          title: newPyq.title,
+          file: newPyq.file,
+        },
+      });
+    } catch (error) {
+      // If saving fails, delete the uploaded file from GridFS
+      if (file && file._id) {
+        bucket.delete(file._id, (deleteErr) => {
+          if (deleteErr) {
+            console.error("Error deleting file from GridFS:", deleteErr);
+          }
+        });
+      }
+      next(error);
+    }
 
   } catch (error) {
     if (req.file) {
