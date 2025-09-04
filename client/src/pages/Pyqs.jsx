@@ -272,6 +272,7 @@ const Pyqs = () => {
             />
           </div>
         </div>
+                <ComingSoonBanner />
 
         {/* Results Section */}
         <div className="mt-6">
@@ -328,7 +329,6 @@ const Pyqs = () => {
             )}
           </div>
 
-          <ComingSoonBanner />
           {loading ? (
             <div className="flex justify-center py-12">
               <LoadingSpinner />
