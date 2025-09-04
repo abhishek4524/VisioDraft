@@ -32,7 +32,7 @@ export const uploadPyq = async (req, res, next) => {
       subject,
       year,
       uploadedBy,
-      storageMode = "local", // "local" | "gridfs" | "cloudinary"
+      storageMode = "gridfs", // "local" | "gridfs" | "cloudinary"
     } = req.body;
 
     if (!req.file) {
