@@ -471,33 +471,10 @@ const FilterSection = ({
 
 
 const PyqCard = ({ data }) => {
-const handleDownload = async () => {
-  try {
-    const response = await axios.get(
-      `${backendUrl}/api/pyqs/download/${data._id}`,
-      { responseType: "blob" }  // 👈 important
-    );
-
-    // Create file blob
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-
-    // Create a link & click programmatically
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `${data.title}_${data.year}.pdf`); // 👈 filename
-    document.body.appendChild(link);
-    link.click();
-
-    // Cleanup
-    link.remove();
-    window.URL.revokeObjectURL(url);
-  } catch (error) {
-    console.error("Download error:", error);
-    toast.error(error.response?.data?.message || "Failed to download file");
+  const handleClick = () => {
+    // Direct backend download route
+    window.location.href = `${backendUrl}/api/pyqs/download/${data._id}`;
   };
-
-  };
-
   return (
     <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100 group transform hover:-translate-y-1 transition-transform duration-200">
       <div className="p-5">
@@ -550,7 +527,7 @@ const handleDownload = async () => {
             {(data.downloadCount || 0).toLocaleString()} downloads
           </div>
           <Link
-            onClick={handleDownload}
+            onClick={handleClick}
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
           >
             Download
