@@ -328,7 +328,7 @@ const Pyqs = () => {
             )}
           </div>
 
-          {/* <ComingSoonBanner /> */}
+          <ComingSoonBanner />
           {loading ? (
             <div className="flex justify-center py-12">
               <LoadingSpinner />

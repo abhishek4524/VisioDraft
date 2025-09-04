@@ -25,7 +25,7 @@ import React, { useState, useEffect } from "react";
 
 const CONFIG = {
   goLiveAt: "2025-09-05T10:00:00+05:30", // default go live time
-  message: "PYQs will be live from friday 10 AM 🚀",
+  message: "More PYQs will be live from friday 10 AM 🚀",
   autoHideWhenLive: true,
 };
 
