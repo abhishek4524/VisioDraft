@@ -682,7 +682,6 @@ const UploadNotes = () => {
 
   useEffect(() => {
     if (formData.course && formData.semester) {
-      setSubjects(subjectData[formData.course]?.[formData.semester] || []);
       setFormData((prev) => ({ ...prev, subject: "" }));
     }
   }, [formData.course, formData.semester]);
