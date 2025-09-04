@@ -339,7 +339,7 @@ const CommunityChat = () => {
       </div>
 
       {/* Main Chat Content */}
-      <div className="flex-1 p-4 lg:p-6 py-16 lg:py-6">
+      <div className="flex-1 p-4 lg:p-6 py-16 lg:py-6 overflow-scroll lg:overflow-hidden">
         {error ? (
           <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-5 rounded-xl relative max-w-4xl mx-auto my-4 shadow-sm">
             <div className="flex items-start">
