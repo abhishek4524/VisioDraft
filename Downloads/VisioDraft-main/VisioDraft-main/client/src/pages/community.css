@@ -1,0 +1,71 @@
+/* ... (keep your existing animations) */
+
+.community-card-container {
+  perspective: 1000px;
+  height: 300px;
+  cursor: pointer;
+}
+
+.community-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.community-card.flipped {
+  transform: rotateY(180deg);
+}
+
+.community-card-front,
+.community-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.community-card-front {
+  background: white;
+  transform: rotateY(0deg);
+}
+
+.community-card-back {
+  transform: rotateY(180deg);
+}
+
+/* Enhanced hover effects */
+.community-card-container:hover .community-card {
+  transform: rotateY(180deg);
+  box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Glow effect */
+.community-card-container:hover .community-card-front:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 0.75rem;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.community-card-container:hover .community-card-front:before {
+  opacity: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .community-card-container {
+    height: 280px;
+  }
+}
