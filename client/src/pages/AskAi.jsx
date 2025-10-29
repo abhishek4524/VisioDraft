@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { backendUrl } from "../App";
 import { FiSend, FiUser, FiMessageSquare, FiLoader, FiBook, FiHelpCircle, FiFileText, FiSearch } from 'react-icons/fi';
 
 const AskAi = () => {
@@ -63,28 +64,42 @@ const AskAi = () => {
     return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!inputValue.trim() || isLoading) return;
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!inputValue.trim() || isLoading) return;
 
-    // Add user message
-    const userMessage = { id: Date.now(), text: inputValue, sender: 'user' };
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
-    setIsLoading(true);
+  const userMessage = { id: Date.now(), text: inputValue, sender: 'user' };
+  setMessages(prev => [...prev, userMessage]);
+  setInputValue('');
+  setIsLoading(true);
 
-    // Simulate API call delay
-    setTimeout(() => {
-      const aiResponse = getAIResponse(inputValue);
-      const aiMessage = { 
-        id: Date.now() + 1, 
-        text: aiResponse, 
-        sender: 'ai' 
-      };
-      setMessages(prev => [...prev, aiMessage]);
-      setIsLoading(false);
-    }, 1500);
-  };
+  try {
+    const response = await fetch(`${backendUrl}/api/ask`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: inputValue }),
+    });
+
+    const data = await response.json();
+    const aiMessage = {
+      id: Date.now() + 1,
+      text: data.reply,
+      sender: 'ai',
+    };
+
+    setMessages(prev => [...prev, aiMessage]);
+  } catch (error) {
+    const aiMessage = {
+      id: Date.now() + 1,
+      text: "Sorry, I couldn’t connect to the server.",
+      sender: 'ai',
+    };
+    setMessages(prev => [...prev, aiMessage]);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   // Suggested questions with categories
   const suggestedQuestions = [
