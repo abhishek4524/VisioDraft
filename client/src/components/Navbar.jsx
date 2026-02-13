@@ -66,7 +66,7 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navItems = ["PYQs", "Notes", "Upload Notes", "Ask AI", "Community"];
+  const navItems = ["PYQs", "Notes", "Upload Notes", "Ask AI", "Top Picks", "Community"];
 
   return (
     <nav

@@ -4,6 +4,7 @@ import 'dotenv/config';
 import http from "http";
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
+import fetch from 'node-fetch';
 
 import connectDB from './config/mongodb.js';
 import connectCloudinary from './config/cloudinary.js';
@@ -18,6 +19,7 @@ import Message from "./models/Message.js";
 // App config
 const app = express();
 const port = process.env.PORT || 4000;
+const KEY = process.env.YT_API_KEY;
 
 // Connect to DB and Cloudinary
 connectDB();
@@ -125,6 +127,89 @@ app.get("/api/communities/:communityId/messages", async (req, res) => {
     res.status(500).json({ error: "Failed to load messages" });
   }
 });
+
+
+app.post('/api/ask', async (req, res) => {
+  const { message } = req.body;
+
+  try {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",  // you can use other models too
+        messages: [{ role: "user", content: message }],
+      }),
+    });
+
+    const data = await response.json();
+    res.json({ reply: data.choices?.[0]?.message?.content || "Sorry, I didn’t get that." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ reply: "Server error." });
+  }
+});
+
+
+// API endpoint: YouTube Top 5 Videos
+
+app.get('/api/search', async (req, res) => {
+  try {
+    const q = req.query.q || '';
+    const from = req.query.from;
+    const to = req.query.to;
+
+    const searchParams = new URLSearchParams({
+      key: KEY,
+      part: 'snippet',
+      q,
+      type: 'video',
+      maxResults: '50',
+      order: 'viewCount'
+    });
+    if (from) searchParams.append('publishedAfter', new Date(from).toISOString());
+    if (to) searchParams.append('publishedBefore', new Date(to).toISOString());
+
+    const searchResp = await fetch(`https://www.googleapis.com/youtube/v3/search?${searchParams.toString()}`);
+    const searchJson = await searchResp.json();
+    const ids = searchJson.items.map(i => i.id.videoId).filter(Boolean);
+
+    if (ids.length === 0) return res.json({ items: [] });
+
+    const vidParams = new URLSearchParams({
+      key: KEY,
+      part: 'snippet,statistics',
+      id: ids.join(',')
+    });
+    const videosResp = await fetch(`https://www.googleapis.com/youtube/v3/videos?${vidParams.toString()}`);
+    const videosJson = await videosResp.json();
+
+    const items = videosJson.items.map(v => ({
+      id: v.id,
+      title: v.snippet.title,
+      channel: v.snippet.channelTitle,
+      thumbnail: v.snippet.thumbnails.high.url,
+      publishedAt: v.snippet.publishedAt,
+      viewCount: Number(v.statistics.viewCount || 0),
+      likeCount: Number(v.statistics.likeCount || 0),
+      embedUrl: `https://www.youtube.com/embed/${v.id}`
+    }));
+
+    const sortBy = req.query.sort === 'likes' ? 'likeCount' : 'viewCount';
+    items.sort((a,b) => b[sortBy] - a[sortBy]);
+
+    res.json({ items: items.slice(0,5) });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
+
 
 // Start server (important: use `server.listen`)
 server.listen(port, () => 
